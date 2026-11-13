@@ -51,7 +51,7 @@ so the full loop runs deterministically.
 make setup     # venv plus editable install
 make test      # full suite, including the end-to-end smoke test
 make smoke     # just the smoke test, verbose
-make eval      # load and validate the example eval suite
+make eval      # run the full 30-task suite (recovery on/off) and write results
 ```
 
 Or with Docker:
@@ -66,21 +66,36 @@ checkpointing, and tracing, then reads the trace back and checks it.
 
 ## Results
 
-Results will appear here only after the eval harness has run the task
-suite, computed from traces, with the suite version and model route named
-next to the numbers. Until then this section stays empty on purpose.
+From the eval harness, run 2026-11-13 (`make eval`; full table and
+per-task detail in
+[evals/results/results_aegis-suite-v2_2026-11-13.md](evals/results/results_aegis-suite-v2_2026-11-13.md)).
+Model route: the scripted fake model with a fixed plan per task, so these
+numbers measure the runtime (permission gates, browser tool, recovery),
+not a model's planning. Browser driver: Playwright (Chromium headless)
+against the local hostile test site. Mean cost per task is zero because
+the fake model is unmetered; real-adapter calls log estimated costs in
+their traces, flagged as estimates.
 
 | Suite | Tasks | Recovery | Pass rate | Mean cost per task | Mean latency per task |
 | --- | --- | --- | --- | --- | --- |
-| (no runs yet) | | | | | |
+| aegis-suite-v2 | 30 | on | 100.0% | $0.00 (fake model) | 0.86 s |
+| aegis-suite-v2 | 30 | off | 56.7% | $0.00 (fake model) | 0.50 s |
+
+Recovery events per passed task: 0.93 (on) vs 0.35 (off). All 13 tasks
+with a designed-in mid-task failure pass with recovery on and fail with
+recovery off; the benign and safety tasks pass in both modes, including
+the ones whose correct outcome is a refused run.
 
 ## Status
 
-Phase 1 (current): scaffold, agent core, permissioned registry, recovery
-engine, trace store, fake-model local mode, eval suite format, tests.
+Phase 1: scaffold, agent core, permissioned registry, recovery engine,
+trace store, fake-model local mode, eval suite format, tests.
 
-Phase 2: real provider adapters (Anthropic, OpenAI, local), the browser
-tool with a local test site, eval execution and scoring, the recovery
-on/off ablation over the full suite.
+Phase 2 (current): real provider adapters (Anthropic, OpenAI, local
+Ollama-style) behind the adapter interface with price-table cost
+estimates; the browser tool (Playwright/Chromium, semantic grounding,
+verify-after-action, typed failures) with the local hostile test site;
+eval execution and scoring with the recovery on/off ablation over a
+30-task suite.
 
 Phase 3: trace explorer UI, larger task suites, hosted demo.

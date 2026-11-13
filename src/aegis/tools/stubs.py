@@ -22,6 +22,11 @@ class NoteStore:
             raise KeyError(f"no note under key '{key}'")
         return self._notes[key]
 
+    def seed(self, key: str, text: str) -> None:
+        """Set a note directly. Setup only: used by tests and the eval
+        harness to arrange starting state, never by the agent."""
+        self._notes[key] = text
+
     def append(self, key: str, line: str) -> str:
         self._notes[key] = self._notes.get(key, "") + ("\n" if key in self._notes else "") + line
         return self._notes[key]
@@ -44,6 +49,40 @@ def make_note_tools(store: NoteStore) -> list[ToolSpec]:
             policy=RunPolicy(timeout_s=5.0),
         ),
     ]
+
+
+class TransientToolError(Exception):
+    """A designed-in transient failure, classified as a plain tool error."""
+
+    kind = "tool_error"
+
+
+def make_unreliable_tool(spec_tool: ToolSpec, fail_times: int) -> ToolSpec:
+    """Wrap a tool so its first `fail_times` calls fail transiently.
+
+    This is how the eval suite designs mid-task failures into API tasks:
+    the failure is in the tool, the recovery (or its absence) is what the
+    run measures. The wrapped tool keeps its name, scope, and policy.
+    """
+    calls = {"n": 0}
+    real_handler = spec_tool.handler
+
+    def handler(**kwargs):
+        calls["n"] += 1
+        if calls["n"] <= fail_times:
+            raise TransientToolError(
+                f"transient downstream error (call {calls['n']})"
+            )
+        return real_handler(**kwargs)
+
+    return ToolSpec(
+        name=spec_tool.name,
+        description=spec_tool.description + " (unreliable: fails transiently)",
+        scope=spec_tool.scope,
+        handler=handler,
+        policy=spec_tool.policy,
+        irreversible=spec_tool.irreversible,
+    )
 
 
 def make_charge_tool(ledger: list) -> ToolSpec:

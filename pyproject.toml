@@ -12,10 +12,11 @@ license = { text = "MIT" }
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
-# Real provider adapters land in Phase 2 behind the ModelAdapter interface.
-# anthropic = ["anthropic>=0.40"]
-# openai = ["openai>=1.50"]
+dev = ["pytest>=8", "playwright>=1.40"]
+# The provider adapters speak the providers' HTTP APIs with the standard
+# library only, so they need no SDK dependency. The browser tool needs
+# Playwright plus its Chromium build (playwright install chromium).
+browser = ["playwright>=1.40"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

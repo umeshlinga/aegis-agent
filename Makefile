@@ -13,9 +13,10 @@ test:
 smoke:
 	$(PY) -m pytest tests/test_smoke.py -v
 
-# Phase 2: eval harness entry point (task suite, recovery on/off ablation).
+# Eval harness: run the full suite (recovery on/off ablation) and write
+# the dated results table under evals/results/.
 eval:
-	$(PY) -m aegis.evals.run --suite evals/tasks.example.json
+	$(PY) -m aegis.evals.run --suite evals/tasks.json
 
 clean:
 	rm -rf traces checkpoints .pytest_cache

@@ -58,6 +58,7 @@ class ModelRouter:
                     output_tokens=response.output_tokens,
                     latency_ms=round(response.latency_ms, 3),
                     cost_usd=response.cost_usd,
+                    cost_is_estimate=response.cost_is_estimate,
                 )
             return response
         raise ModelError(

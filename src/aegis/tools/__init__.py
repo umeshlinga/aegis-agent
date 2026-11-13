@@ -1,3 +1,4 @@
+from .browser import BrowserSession, BrowserToolError, make_browser_tools
 from .registry import (
     PermissionDenied,
     PermissionScope,
@@ -14,4 +15,7 @@ __all__ = [
     "ToolRegistry",
     "ToolResult",
     "ToolSpec",
+    "BrowserSession",
+    "BrowserToolError",
+    "make_browser_tools",
 ]

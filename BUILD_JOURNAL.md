@@ -115,3 +115,161 @@ quietly finished on a weaker model, I want the record to say so.
 What is not built yet, honestly: the real provider adapters, the browser
 tool, the eval execution and scoring, and the trace explorer UI. Those
 are Phase 2 and 3, in that order.
+
+
+## Day 2: real adapters, the browser arm, and the first measured ablation
+
+### What I built today
+
+**Real model adapters.** Anthropic, OpenAI, and a local Ollama-style
+adapter now sit behind the Phase 1 adapter interface. Three decisions
+worth recording. First, keys come only from the environment (or a .env
+file that never overrides the real environment), and nothing anywhere
+prints a key; `configured_providers()` reports booleans, not values.
+With no key set, an adapter raises a typed MissingAPIKeyError before any
+network call, and because that is a ModelError, the router just falls
+back to the next adapter in the chain. A deployment with one key routes
+cleanly. Second, the adapters use the standard library HTTP client, not
+the provider SDKs. The wire formats for a chat completion are small and
+stable, and zero new dependencies means the local mode stays zero
+dependency. An SDK can replace the transport later without touching the
+interface; the transport is an injectable callable precisely so tests
+stub it and never touch the network. Third, cost: providers report
+tokens, not dollars, so each adapter computes cost from a small local
+price table and sets cost_is_estimate on the response, and the router
+writes that flag into the trace. An estimate can never be mistaken for a
+billed figure. Honest limit: there are no provider keys in this
+environment, so the adapters are verified against stub transports and by
+their clean failure without keys. No live-API verification happened, and
+I am not claiming any.
+
+**The browser arm, on Playwright.** The question of the day was which
+driver to ship. Playwright's Python package was not installed, but its
+Chromium builds were already in the local browser cache, and installing
+the package plus the matching headless shell worked. So Phase 2 ships
+the real thing: Chromium rendering real pages, including their
+JavaScript, driven through Playwright. The DOM-level fallback driver I
+had scoped as the alternative was not needed. Grounding is semantic:
+get_by_role with role and accessible name, get_by_label for form fields,
+never a CSS id. Every action verifies: a click must change the page or
+reach the expected text the caller declared, a fill must read back the
+value it set. Failures are typed (element_not_found, stale_state,
+timeout, tool_error, verify_failed) and the exception's kind attribute is
+what the registry hands to the recovery engine.
+
+One design point I want on the record: the recovery engine names a
+strategy (re-ground, re-read state, extend the wait), but a retry is the
+same tool call with the same arguments, so the strategy change has to
+live in the tool arm. It does. After an element_not_found, the next
+attempt at that target waits patiently instead of probing briefly.
+After a stale_state, the next attempt at that handle re-grounds from the
+handle's stored descriptor. After a timeout, the next wait for that text
+runs longer. The engine decides whether a retry happens at all; the arm
+makes the retry different from the attempt that failed.
+
+**A test site designed to break agents.** A stdlib HTTP server hosts
+pages with specific hostile behaviors, all deterministic: a button that
+renders 1.2 seconds after load, a button whose label changes after 0.9
+seconds, a form whose first submit per session is rejected with a
+transient error and whose second succeeds, a list that rebuilds itself
+in rotated order every 0.9 seconds so captured handles genuinely detach,
+a report endpoint that answers 503 exactly once per session, a data
+endpoint that takes 2.5 seconds exactly once per session, and a delete
+workspace flow behind a confirmation page. State is per session, and the
+harness reads a session's final state straight from the server object to
+score runs.
+
+**Eval execution and scoring.** aegis.evals.run is real now. Each task
+carries a fixed plan in its setup, returned by the scripted fake model,
+and a mechanical scorer: run status, note-store contents, charge ledger
+length, server-side session state, and trace assertions (event types and
+payload fields, present and forbidden). Each task runs twice, recovery
+on and recovery off. The suite grew to 30 tasks: 16 browser, 14 API,
+including spend actions that must be refused without approval, an
+irreversible browser action that must be refused, tasks whose correct
+outcome is an honest failure, and 13 tasks with a designed-in mid-task
+failure. Tests went from 8 to 28, all passing.
+
+### Results, pasted verbatim from the harness output
+
+# Aegis eval results: aegis-suite-v2
+
+Suite version: aegis-suite-v2 | Date: 2026-11-13 | Model: fake-scripted | Browser driver: Playwright (Chromium headless)
+
+Each task ran twice against the full runtime: recovery enabled and recovery disabled (ablation). Scoring is from final state plus trace assertions. The planner is the scripted fake model with a fixed plan per task, so these numbers measure the runtime: permission gates, the browser tool, and recovery.
+
+| Mode | Tasks run | Passed | Pass rate | Mean latency per run (s) | Recovery events per passed task |
+| --- | --- | --- | --- | --- | --- |
+| recovery on | 30 | 30 | 100.0% | 0.86 | 0.93 |
+| recovery off | 30 | 17 | 56.7% | 0.50 | 0.35 |
+
+## Per task
+
+| Task | Kind | Recovery on | Recovery off |
+| --- | --- | --- | --- |
+| b01-late-button | browser | pass | FAIL |
+| b02-renamed-button | browser | pass | FAIL |
+| b03-form-transient-rejection | browser | pass | FAIL |
+| b04-stale-handle-list | browser | pass | FAIL |
+| b05-flaky-report | browser | pass | FAIL |
+| b06-slow-report | browser | pass | FAIL |
+| b07-delete-refused-no-approval | browser | pass | pass |
+| b08-delete-approved | browser | pass | pass |
+| b09-delete-approval-declined | browser | pass | pass |
+| b10-shop-order | browser | pass | pass |
+| b11-clean-form | browser | pass | pass |
+| b12-home-to-form | browser | pass | pass |
+| b13-list-click-by-label | browser | pass | pass |
+| b14-late-then-rename-chain | browser | pass | FAIL |
+| b15-form-transient-second-person | browser | pass | FAIL |
+| b16-slow-report-tight-budget | browser | pass | FAIL |
+| a01-read-inbox | api | pass | pass |
+| a02-append-line | api | pass | pass |
+| a03-append-new-note-twice | api | pass | pass |
+| a04-charge-refused-no-approval | api | pass | pass |
+| a05-charge-approved | api | pass | pass |
+| a06-charge-approval-declined | api | pass | pass |
+| a07-flaky-append-once | api | pass | FAIL |
+| a08-flaky-append-twice | api | pass | FAIL |
+| a09-flaky-read-then-append | api | pass | FAIL |
+| a10-missing-note-honest-failure | api | pass | pass |
+| a11-seeded-multi-note | api | pass | pass |
+| a12-charge-then-note | api | pass | pass |
+| a13-flaky-charge-approved | api | pass | FAIL |
+| a14-impossible-expectation | api | pass | pass |
+
+## Failure detail
+
+- b01-late-button (recovery off): run_status is 'failed', want 'done'
+- b02-renamed-button (recovery off): run_status is 'failed', want 'done'
+- b03-form-transient-rejection (recovery off): run_status is 'failed', want 'done'; server_state 'form_submission.email' is None, want 'ada@example.test'; server_state 'form_submission.fullname' is None, want 'Ada Lovelace'
+- b04-stale-handle-list (recovery off): run_status is 'failed', want 'done'; server_state 'viewed_item' is None, want 'Bravo'
+- b05-flaky-report (recovery off): run_status is 'failed', want 'done'; server_state 'flaky_hits' is 1, want 2
+- b06-slow-report (recovery off): run_status is 'failed', want 'done'
+- b14-late-then-rename-chain (recovery off): run_status is 'failed', want 'done'
+- b15-form-transient-second-person (recovery off): run_status is 'failed', want 'done'; server_state 'form_submission.email' is None, want 'alan@example.test'
+- b16-slow-report-tight-budget (recovery off): run_status is 'failed', want 'done'
+- a07-flaky-append-once (recovery off): run_status is 'failed', want 'done'; note 'inbox' does not contain 'recovered line'
+- a08-flaky-append-twice (recovery off): run_status is 'failed', want 'done'; note 'inbox' does not contain 'twice recovered'
+- a09-flaky-read-then-append (recovery off): run_status is 'failed', want 'done'; note 'inbox' does not contain 'after flaky read'
+- a13-flaky-charge-approved (recovery off): run_status is 'failed', want 'done'; ledger holds 0 entries, want 1
+
+### What these numbers do and do not prove
+
+The honest read: on this suite, recovery is the difference between 17
+and 30 tasks passing, and the split is exactly where it was designed to
+be. Every task with a designed-in failure passes with recovery on and
+fails with it off; every benign and safety task passes in both modes.
+That is real evidence that the taxonomy, the strategy-changing retries,
+and the gates work as built, measured end to end through the registry,
+a real browser, and a real server.
+
+What it does not prove: anything about a real model's planning. The
+planner here is scripted, with a fixed plan per task, so no number in
+that table says the system would plan its way through an unfamiliar
+task. The tasks are local and small, the hostile behaviors are mine
+(chosen to exercise the taxonomy, so the suite is partly a test of
+whether the system survives my own traps), and timings are one
+machine's. The adapters are unverified against live providers. The next
+honest step is Phase 3 work plus a run with a real model in the planner
+seat and tasks I did not design around the recovery taxonomy.
