@@ -1,0 +1,18 @@
+# docker compose up --build    ->  explorer on http://localhost:8080, traces on http://localhost:16686
+services:
+  aegis:
+    build: .
+    env_file: .env
+    environment:
+      AEGIS_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+    ports: ["8080:8080"]
+    volumes: ["./data:/data"]
+    depends_on: [jaeger]
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    ports: ["16686:16686", "4318:4318"]
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    volumes: ["./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]

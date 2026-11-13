@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis · Run Explorer</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#151a22; --muted:#5d6675; --line:#e3e6eb;
+    --accent:#2b59c3; --ok:#1f8a4c; --warn:#b7791f; --bad:#c0392b; --wait:#7a4cc2;
+    --step:#2b59c3; --llm:#7a4cc2; --tool:#1f8a4c; --browser:#c0692b; --event:#8a94a6;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+  header{display:flex;align-items:center;gap:14px;padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--line)}
+  header h1{font-size:17px;margin:0;letter-spacing:.2px}
+  header .mode{font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:10px;background:#eef2fb;color:var(--accent)}
+  header .sub{color:var(--muted);font-size:13px}
+  main{display:grid;grid-template-columns:330px 1fr;gap:16px;padding:16px 22px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 10px}
+  .runs{max-height:52vh;overflow:auto;margin:0 -6px}
+  .run{display:flex;justify-content:space-between;gap:8px;padding:8px 6px;border-radius:6px;cursor:pointer}
+  .run:hover{background:#f1f3f7}.run.sel{background:#e9effb}
+  .id{font-family:var(--mono);font-size:12.5px}
+  .pill{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:10px;white-space:nowrap}
+  .succeeded{background:#e5f4ea;color:var(--ok)}.failed{background:#fbe9e7;color:var(--bad)}
+  .running{background:#eef2fb;color:var(--accent)}.waiting_approval{background:#f1eafa;color:var(--wait)}
+  .cancelled,.pending,.skipped{background:#eef0f3;color:var(--muted)}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
+  select,textarea,button{font:inherit}
+  select,textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:7px;background:#fff}
+  textarea{font-family:var(--mono);font-size:12px;min-height:120px}
+  button{border:0;border-radius:6px;padding:7px 12px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+  button.ghost{background:#eef0f3;color:var(--ink)} button.bad{background:var(--bad)} button.ok{background:var(--ok)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:12px 0}
+  .stat{border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+  .stat .v{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+  .stat .k{font-size:11.5px;color:var(--muted)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-family:var(--mono);font-size:11.5px;padding:2px 7px;border-radius:5px;background:#f1f3f7;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .wf{position:relative;margin-top:6px}
+  .wfrow{display:grid;grid-template-columns:230px 1fr;align-items:center;height:22px;font-size:12px}
+  .wfrow .nm{font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+  .track{position:relative;height:14px}
+  .bar{position:absolute;height:12px;top:1px;border-radius:3px;min-width:2px}
+  .bar.err{outline:2px solid var(--bad);outline-offset:-1px}
+  .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .events{max-height:300px;overflow:auto;font-family:var(--mono);font-size:12px}
+  .ev{padding:3px 0;border-bottom:1px dashed var(--line)}
+  .ev b{color:var(--accent);font-weight:600}
+  pre{background:#f6f7f9;border:1px solid var(--line);border-radius:6px;padding:10px;font-size:12px;overflow:auto;max-height:420px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .muted{color:var(--muted)} .empty{color:var(--muted);padding:30px;text-align:center}
+  @media (max-width:1000px){main{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Aegis</h1><span class="mode">mode: {{MODE}}</span>
+  <span class="sub">durable multi-agent runs · verified browser actions · approvals · traces</span>
+</header>
+<main>
+  <div>
+    <div class="panel">
+      <h2>Start a run</h2>
+      <label>Workload</label>
+      <select id="wl" onchange="preset()"><option value="variant">variant evidence</option><option value="company">company research</option></select>
+      <label>Input (JSON)</label>
+      <textarea id="inp"></textarea>
+      <div class="row" style="margin-top:8px"><button onclick="startRun()">Run</button><span id="msg" class="muted"></span></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h2>Approvals waiting</h2><div id="appr" class="muted">none</div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <h2>Runs</h2><div id="runs" class="runs"></div>
+    </div>
+  </div>
+  <div id="detail" class="panel"><div class="empty">Select a run to see its steps, timeline and trace.</div></div>
+</main>
+<script>
+const COLORS={step:'var(--step)',llm:'var(--llm)',tool:'var(--tool)',browser:'var(--browser)',event:'var(--event)'};
+let selected=null, timer=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function preset(){ $('inp').value = $('wl').value==='variant'
+  ? JSON.stringify({variant:"17-43045712-T-C", phenotype:"hereditary breast and ovarian cancer", use_browser:true},null,2)
+  : JSON.stringify({start_url:"https://example.com", domain:"example.com", draft_outreach:true,
+      sender:{name:"Umesh", company:"Aegis", offer:"reliable AI agents"}},null,2); }
+async function j(u,o){const r=await fetch(u,o); if(!r.ok) throw new Error(await r.text()); return r.json();}
+async function startRun(){
+  try{const inp=JSON.parse($('inp').value);
+    const r=await j('/api/runs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({workload:$('wl').value,input:inp})});
+    $('msg').textContent='started '+r.run_id; selected=r.run_id; refresh();
+  }catch(e){$('msg').textContent=e.message.slice(0,120);}
+}
+async function decide(id,ok){await j('/api/approvals/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({approved:ok,by:'explorer'})}); refresh();}
+async function act(path){await j('/api/runs/'+selected+'/'+path,{method:'POST'}); refresh();}
+async function refresh(){
+  const runs=await j('/api/runs');
+  $('runs').innerHTML=runs.map(r=>`<div class="run ${r.run_id===selected?'sel':''}" onclick="selected='${r.run_id}';refresh()">
+     <span><span class="id">${r.run_id}</span> <span class="muted">${r.workload}</span></span><span class="pill ${r.status}">${r.status.replace('_',' ')}</span></div>`).join('')||'<div class="muted">no runs yet</div>';
+  const ap=await j('/api/approvals');
+  $('appr').innerHTML=ap.length?ap.map(a=>`<div style="margin-bottom:10px"><div><b>${esc(a.tool)}</b> · <span class="id">${a.run_id}</span> · risk ${a.risk}</div>
+     <pre style="max-height:140px">${esc(JSON.stringify(a.args,null,1))}</pre>
+     <div class="row"><button class="ok" onclick="decide(${a.id},true)">Approve</button><button class="bad" onclick="decide(${a.id},false)">Reject</button></div></div>`).join(''):'none';
+  if(selected) await renderRun(selected);
+}
+function fmt(n,d=2){return (n==null||isNaN(n))?'–':Number(n).toFixed(d)}
+async function renderRun(id){
+  const [r,spans,evs]=await Promise.all([j('/api/runs/'+id),j('/api/runs/'+id+'/spans'),j('/api/runs/'+id+'/events')]);
+  const u=(r.result&&r.result.usage)||{};
+  const llm=spans.filter(s=>s.kind==='llm'), tools=spans.filter(s=>s.kind==='tool');
+  const cost=llm.reduce((a,s)=>a+(s.attrs.cost_usd||0),0);
+  const t0=Math.min(...spans.map(s=>s.start)), t1=Math.max(...spans.map(s=>s.end||s.start));
+  const span=Math.max(t1-t0,0.001);
+  const steps=Object.values(r.steps).sort((a,b)=>(a.started_at||0)-(b.started_at||0));
+  const shown=spans.filter(s=>s.kind!=='event').slice(0,160);
+  $('detail').innerHTML=`
+   <div class="row" style="justify-content:space-between">
+     <div><span class="id" style="font-size:15px">${r.run_id}</span> · ${r.workload} <span class="pill ${r.status}">${r.status.replace('_',' ')}</span></div>
+     <div class="row"><button class="ghost" onclick="act('resume')">Resume</button><button class="bad" onclick="act('cancel')">Cancel</button></div>
+   </div>
+   ${r.error?`<div style="color:var(--bad);margin-top:6px">${esc(r.error)}</div>`:''}
+   <div class="stats">
+     <div class="stat"><div class="v">${fmt(spans.length?span:0,1)}s</div><div class="k">wall time</div></div>
+     <div class="stat"><div class="v">${llm.length}</div><div class="k">LLM calls</div></div>
+     <div class="stat"><div class="v">$${fmt(cost,4)}</div><div class="k">LLM cost</div></div>
+     <div class="stat"><div class="v">${tools.length}</div><div class="k">tool calls</div></div>
+     <div class="stat"><div class="v">${evs.filter(e=>e.kind==='tool_retry').length}</div><div class="k">retries</div></div>
+   </div>
+   <div class="chips">${Object.entries(r.labels||{}).map(([k,v])=>`<span class="chip">${k} ×${v}</span>`).join('')||'<span class="muted">no failure labels</span>'}</div>
+   <h2 style="margin-top:16px">Timeline</h2>
+   <div class="legend">${Object.entries(COLORS).filter(([k])=>k!=='event').map(([k,c])=>`<span><span class="sw" style="background:${c}"></span>${k}</span>`).join('')}<span><span class="sw" style="outline:2px solid var(--bad)"></span>error</span></div>
+   <div class="wf">${shown.map(s=>{const l=(s.start-t0)/span*100, w=Math.max(((s.end||s.start)-s.start)/span*100,0.3);
+      const tip=esc(s.name+' '+JSON.stringify(s.attrs).slice(0,300));
+      return `<div class="wfrow" title="${tip}"><div class="nm">${esc(s.name)}</div><div class="track"><div class="bar ${s.status==='error'?'err':''}" style="left:${l}%;width:${w}%;background:${COLORS[s.kind]||'#999'}"></div></div></div>`}).join('')}</div>
+   <div class="grid2" style="margin-top:16px">
+     <div><h2>Steps</h2><table><tr><th>step</th><th>status</th><th>attempts</th></tr>
+       ${steps.map(s=>`<tr><td class="id">${s.step_id}</td><td><span class="pill ${s.status}">${s.status}</span></td><td>${s.attempts}${s.error?`<div class="muted">${esc(s.error).slice(0,90)}</div>`:''}</td></tr>`).join('')}</table></div>
+     <div><h2>Events</h2><div class="events">${evs.slice(-200).reverse().map(e=>`<div class="ev"><b>${e.kind}</b> ${esc(JSON.stringify(e.data)).slice(0,220)}</div>`).join('')}</div></div>
+   </div>
+   <h2 style="margin-top:16px">Result</h2><pre>${esc(JSON.stringify(r.result&&r.result.output,null,2)||'(not finished)')}</pre>`;
+}
+preset(); refresh(); timer=setInterval(refresh,2000);
+</script>
+</body>
+</html>

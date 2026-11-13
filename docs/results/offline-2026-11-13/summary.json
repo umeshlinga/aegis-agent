@@ -1,0 +1,2270 @@
+{
+  "groups": [
+    {
+      "system": "aegis",
+      "profile": "crash_mid",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.06,
+      "p95_wall_s": 0.1,
+      "mean_llm_calls": 6.22,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "aegis",
+      "profile": "harsh",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 53,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.053,
+      "p95_wall_s": 0.132,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "aegis",
+      "profile": "mild",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 25,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.035,
+      "p95_wall_s": 0.089,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "aegis",
+      "profile": "none",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": null,
+      "runs_with_faults": 0,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.038,
+      "p95_wall_s": 0.081,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "aegis",
+      "profile": "outage",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.75,
+      "coverage": 0.467,
+      "abstain_rate": 0.533,
+      "auroc_plp_vs_blb": 0.99,
+      "auroc_ci": [
+        0.97,
+        1.0
+      ],
+      "citation_validity": null,
+      "citations_total": 0,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 1.337,
+      "p95_wall_s": 1.384,
+      "mean_llm_calls": 2.2,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.467,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.467,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.417,
+          "accuracy": 0.72
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.35,
+          "accuracy": 0.667
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.267,
+          "accuracy": 0.875
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.233,
+          "accuracy": 0.857
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.183,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "baseline",
+      "profile": "crash_mid",
+      "n": 60,
+      "success_rate": 0.517,
+      "success_ci": [
+        0.393,
+        0.638
+      ],
+      "recovery_rate_under_faults": 0.517,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.71,
+      "coverage": 0.517,
+      "abstain_rate": 0.0,
+      "auroc_plp_vs_blb": 0.989,
+      "auroc_ci": [
+        0.957,
+        1.0
+      ],
+      "citation_validity": 0.857,
+      "citations_total": 14,
+      "reports_with_ungrounded_numbers": 7,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.035,
+      "p95_wall_s": 0.16,
+      "mean_llm_calls": 1.55,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 1.0,
+          "accuracy": 0.71
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.742,
+          "accuracy": 0.783
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.613,
+          "accuracy": 0.789
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.484,
+          "accuracy": 0.867
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.419,
+          "accuracy": 0.923
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.387,
+          "accuracy": 0.917
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.323,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.226,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.194,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.194,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.129,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.097,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.097,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "baseline",
+      "profile": "harsh",
+      "n": 60,
+      "success_rate": 0.183,
+      "success_ci": [
+        0.106,
+        0.299
+      ],
+      "recovery_rate_under_faults": 0.0,
+      "runs_with_faults": 49,
+      "accuracy_3class_answered": 0.636,
+      "coverage": 0.183,
+      "abstain_rate": 0.0,
+      "auroc_plp_vs_blb": 0.969,
+      "auroc_ci": [
+        null,
+        null
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 3,
+      "reports_with_ungrounded_numbers": 1,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.011,
+      "p95_wall_s": 0.082,
+      "mean_llm_calls": 0.55,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 1.0,
+          "accuracy": 0.636
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.727,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.545,
+          "accuracy": 0.667
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.455,
+          "accuracy": 0.8
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.273,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.182,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.182,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.091,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.091,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.091,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.091,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.0,
+          "accuracy": null
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.0,
+          "accuracy": null
+        }
+      ]
+    },
+    {
+      "system": "baseline",
+      "profile": "mild",
+      "n": 60,
+      "success_rate": 0.583,
+      "success_ci": [
+        0.457,
+        0.699
+      ],
+      "recovery_rate_under_faults": 0.0,
+      "runs_with_faults": 25,
+      "accuracy_3class_answered": 0.543,
+      "coverage": 0.583,
+      "abstain_rate": 0.0,
+      "auroc_plp_vs_blb": 0.993,
+      "auroc_ci": [
+        0.971,
+        1.0
+      ],
+      "citation_validity": 0.87,
+      "citations_total": 23,
+      "reports_with_ungrounded_numbers": 10,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.007,
+      "p95_wall_s": 0.039,
+      "mean_llm_calls": 1.75,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 1.0,
+          "accuracy": 0.543
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.829,
+          "accuracy": 0.586
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.714,
+          "accuracy": 0.52
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.543,
+          "accuracy": 0.579
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.429,
+          "accuracy": 0.667
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.343,
+          "accuracy": 0.833
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.257,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.229,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.171,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.171,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.143,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.086,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.086,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "baseline",
+      "profile": "none",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": null,
+      "runs_with_faults": 0,
+      "accuracy_3class_answered": 0.65,
+      "coverage": 1.0,
+      "abstain_rate": 0.0,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 0.882,
+      "citations_total": 34,
+      "reports_with_ungrounded_numbers": 16,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.078,
+      "p95_wall_s": 0.128,
+      "mean_llm_calls": 3.0,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 1.0,
+          "accuracy": 0.65
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.817,
+          "accuracy": 0.653
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.7,
+          "accuracy": 0.643
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "baseline",
+      "profile": "outage",
+      "n": 60,
+      "success_rate": 0.0,
+      "success_ci": [
+        0.0,
+        0.06
+      ],
+      "recovery_rate_under_faults": 0.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": null,
+      "coverage": 0.0,
+      "abstain_rate": 0.0,
+      "auroc_plp_vs_blb": null,
+      "auroc_ci": [
+        null,
+        null
+      ],
+      "citation_validity": null,
+      "citations_total": 0,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.003,
+      "p95_wall_s": 0.017,
+      "mean_llm_calls": 0.0,
+      "coverage_accuracy": []
+    },
+    {
+      "system": "no_degrade",
+      "profile": "crash_mid",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.015,
+      "p95_wall_s": 0.078,
+      "mean_llm_calls": 6.22,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_degrade",
+      "profile": "harsh",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 53,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.08,
+      "p95_wall_s": 0.203,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_degrade",
+      "profile": "mild",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 18,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.026,
+      "p95_wall_s": 0.078,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_degrade",
+      "profile": "none",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": null,
+      "runs_with_faults": 0,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.062,
+      "p95_wall_s": 0.091,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_degrade",
+      "profile": "outage",
+      "n": 60,
+      "success_rate": 0.0,
+      "success_ci": [
+        0.0,
+        0.06
+      ],
+      "recovery_rate_under_faults": 0.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": null,
+      "coverage": 0.0,
+      "abstain_rate": 0.0,
+      "auroc_plp_vs_blb": null,
+      "auroc_ci": [
+        null,
+        null
+      ],
+      "citation_validity": null,
+      "citations_total": 0,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 1.327,
+      "p95_wall_s": 1.345,
+      "mean_llm_calls": 0.0,
+      "coverage_accuracy": []
+    },
+    {
+      "system": "no_retries",
+      "profile": "crash_mid",
+      "n": 60,
+      "success_rate": 0.75,
+      "success_ci": [
+        0.628,
+        0.842
+      ],
+      "recovery_rate_under_faults": 0.75,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.588,
+      "coverage": 0.567,
+      "abstain_rate": 0.244,
+      "auroc_plp_vs_blb": 0.999,
+      "auroc_ci": [
+        0.991,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 22,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.024,
+      "p95_wall_s": 0.041,
+      "mean_llm_calls": 4.63,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.756,
+          "accuracy": 0.588
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.756,
+          "accuracy": 0.588
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.733,
+          "accuracy": 0.606
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.578,
+          "accuracy": 0.615
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.422,
+          "accuracy": 0.684
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.378,
+          "accuracy": 0.765
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.289,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.2,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.156,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.156,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.089,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.067,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.067,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_retries",
+      "profile": "harsh",
+      "n": 60,
+      "success_rate": 0.533,
+      "success_ci": [
+        0.409,
+        0.654
+      ],
+      "recovery_rate_under_faults": 0.451,
+      "runs_with_faults": 51,
+      "accuracy_3class_answered": 0.739,
+      "coverage": 0.383,
+      "abstain_rate": 0.281,
+      "auroc_plp_vs_blb": 1.0,
+      "auroc_ci": [
+        1.0,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 6,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.007,
+      "p95_wall_s": 0.048,
+      "mean_llm_calls": 2.08,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.719,
+          "accuracy": 0.739
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.719,
+          "accuracy": 0.739
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.688,
+          "accuracy": 0.727
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.594,
+          "accuracy": 0.737
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.406,
+          "accuracy": 0.923
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.406,
+          "accuracy": 0.923
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.312,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.156,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.156,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.125,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.094,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.094,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.094,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_retries",
+      "profile": "mild",
+      "n": 60,
+      "success_rate": 0.867,
+      "success_ci": [
+        0.758,
+        0.931
+      ],
+      "recovery_rate_under_faults": 0.636,
+      "runs_with_faults": 22,
+      "accuracy_3class_answered": 0.639,
+      "coverage": 0.6,
+      "abstain_rate": 0.308,
+      "auroc_plp_vs_blb": 0.998,
+      "auroc_ci": [
+        0.989,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 22,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.064,
+      "p95_wall_s": 0.088,
+      "mean_llm_calls": 4.77,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.692,
+          "accuracy": 0.639
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.692,
+          "accuracy": 0.639
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.635,
+          "accuracy": 0.667
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.558,
+          "accuracy": 0.655
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.442,
+          "accuracy": 0.739
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.365,
+          "accuracy": 0.842
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.308,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.192,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.154,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.154,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.077,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.058,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.058,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_retries",
+      "profile": "none",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": null,
+      "runs_with_faults": 0,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.011,
+      "p95_wall_s": 0.024,
+      "mean_llm_calls": 6.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_retries",
+      "profile": "outage",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.75,
+      "coverage": 0.467,
+      "abstain_rate": 0.533,
+      "auroc_plp_vs_blb": 0.99,
+      "auroc_ci": [
+        0.97,
+        1.0
+      ],
+      "citation_validity": null,
+      "citations_total": 0,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.043,
+      "p95_wall_s": 0.07,
+      "mean_llm_calls": 2.2,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.467,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.467,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.417,
+          "accuracy": 0.72
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.35,
+          "accuracy": 0.667
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.267,
+          "accuracy": 0.875
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.233,
+          "accuracy": 0.857
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.183,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_verifier",
+      "profile": "crash_mid",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.027,
+      "p95_wall_s": 0.054,
+      "mean_llm_calls": 5.22,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_verifier",
+      "profile": "harsh",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 54,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.083,
+      "p95_wall_s": 0.179,
+      "mean_llm_calls": 5.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_verifier",
+      "profile": "mild",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 16,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.021,
+      "p95_wall_s": 0.08,
+      "mean_llm_calls": 5.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_verifier",
+      "profile": "none",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": null,
+      "runs_with_faults": 0,
+      "accuracy_3class_answered": 0.628,
+      "coverage": 0.717,
+      "abstain_rate": 0.283,
+      "auroc_plp_vs_blb": 0.997,
+      "auroc_ci": [
+        0.988,
+        1.0
+      ],
+      "citation_validity": 1.0,
+      "citations_total": 30,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 0.024,
+      "p95_wall_s": 0.065,
+      "mean_llm_calls": 5.27,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.717,
+          "accuracy": 0.628
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.683,
+          "accuracy": 0.659
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.567,
+          "accuracy": 0.676
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.433,
+          "accuracy": 0.769
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.367,
+          "accuracy": 0.864
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.3,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.217,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.167,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.117,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    },
+    {
+      "system": "no_verifier",
+      "profile": "outage",
+      "n": 60,
+      "success_rate": 1.0,
+      "success_ci": [
+        0.94,
+        1.0
+      ],
+      "recovery_rate_under_faults": 1.0,
+      "runs_with_faults": 60,
+      "accuracy_3class_answered": 0.75,
+      "coverage": 0.467,
+      "abstain_rate": 0.533,
+      "auroc_plp_vs_blb": 0.99,
+      "auroc_ci": [
+        0.97,
+        1.0
+      ],
+      "citation_validity": null,
+      "citations_total": 0,
+      "reports_with_ungrounded_numbers": 0,
+      "mean_cost_usd": 0.0,
+      "p50_wall_s": 1.346,
+      "p95_wall_s": 1.371,
+      "mean_llm_calls": 2.2,
+      "coverage_accuracy": [
+        {
+          "min_abs_points": 0,
+          "coverage": 0.467,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 1,
+          "coverage": 0.467,
+          "accuracy": 0.75
+        },
+        {
+          "min_abs_points": 2,
+          "coverage": 0.417,
+          "accuracy": 0.72
+        },
+        {
+          "min_abs_points": 3,
+          "coverage": 0.35,
+          "accuracy": 0.667
+        },
+        {
+          "min_abs_points": 4,
+          "coverage": 0.267,
+          "accuracy": 0.875
+        },
+        {
+          "min_abs_points": 5,
+          "coverage": 0.233,
+          "accuracy": 0.857
+        },
+        {
+          "min_abs_points": 6,
+          "coverage": 0.183,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 7,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 8,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 9,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 10,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 11,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        },
+        {
+          "min_abs_points": 12,
+          "coverage": 0.083,
+          "accuracy": 1.0
+        }
+      ]
+    }
+  ],
+  "paired": [
+    {
+      "profile": "crash_mid",
+      "metric": "run success",
+      "a": "baseline",
+      "b": "aegis",
+      "only_b_ok": 29,
+      "only_a_ok": 0,
+      "p_value": 3.725290298461914e-09
+    },
+    {
+      "profile": "harsh",
+      "metric": "run success",
+      "a": "baseline",
+      "b": "aegis",
+      "only_b_ok": 49,
+      "only_a_ok": 0,
+      "p_value": 3.552713678800501e-15
+    },
+    {
+      "profile": "mild",
+      "metric": "run success",
+      "a": "baseline",
+      "b": "aegis",
+      "only_b_ok": 25,
+      "only_a_ok": 0,
+      "p_value": 5.960464477539063e-08
+    },
+    {
+      "profile": "none",
+      "metric": "run success",
+      "a": "baseline",
+      "b": "aegis",
+      "only_b_ok": 0,
+      "only_a_ok": 0,
+      "p_value": 1.0
+    },
+    {
+      "profile": "outage",
+      "metric": "run success",
+      "a": "baseline",
+      "b": "aegis",
+      "only_b_ok": 60,
+      "only_a_ok": 0,
+      "p_value": 1.734723475976807e-18
+    }
+  ],
+  "notes": []
+}

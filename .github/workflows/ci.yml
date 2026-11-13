@@ -1,0 +1,18 @@
+# CI: unit + browser tests, then the offline eval as a quality gate.
+# A change that lowers Aegis's success rate under injected faults below 0.95 fails the build.
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -e ".[dev,rag]"
+      - run: python -m playwright install --with-deps chromium
+      - run: pytest -q
+      - name: Offline eval quality gate
+        run: aegis eval --mode offline --n 60 --profiles none,harsh,crash_mid --gate 0.95 --out evals/results/ci
+      - uses: actions/upload-artifact@v4
+        with: {name: eval-report, path: evals/results/ci}
