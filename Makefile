@@ -1,6 +1,6 @@
 PY := .venv/bin/python
 
-.PHONY: setup test smoke eval clean
+.PHONY: setup test smoke eval demo explorer clean
 
 setup:
 	python3 -m venv .venv
@@ -17,6 +17,16 @@ smoke:
 # the dated results table under evals/results/.
 eval:
 	$(PY) -m aegis.evals.run --suite evals/tasks.json
+
+# Walkthrough demo: three scored showcase tasks against the local test
+# site, narrated from their traces. Presenter script: demo/WALKTHROUGH.md
+demo:
+	$(PY) -m aegis.demo
+
+# Trace explorer: read-only web UI over the demo trace set (generated on
+# first run). Serves http://127.0.0.1:8765/
+explorer:
+	$(PY) -m aegis.explorer
 
 clean:
 	rm -rf traces checkpoints .pytest_cache
