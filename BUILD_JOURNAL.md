@@ -363,3 +363,199 @@ careful to say the v2 numbers measure the runtime, not a model's
 planning. After it, the follow-on work is a larger suite with tasks I
 did not design around the recovery taxonomy, and only then is this the
 version I would put in front of a hiring team.
+
+## V2 Day 1: the product direction, the plan documents, and the first real-data layer
+
+### The direction changed, and I am recording whose call it was
+
+Until today Aegis was a runtime with a case study attached, built to
+show how an agent system should behave. Today the instruction changed,
+in the user's own terms: this has to become a real, massive product,
+for himself, a foundation he can build a company and a product on, not
+only an interview showcase. Real time data, not fake data. Real
+problems fixed, with comparisons he can look at and show. Deeper into
+the LLM and agent subject than the v1 runtime went, with everything
+involved in one project, and bioinformatics integrated at the deepest
+level, because that is his field and his edge. And documentation for
+every step: what was taken, what was given, what tools were used, what
+models, what commands, what the results mean.
+
+I agree with the direction, and this tranche is the honest first step
+of it, sized so it can be finished and verified today instead of
+promised. Tranche 1 is: the product blueprint, the full tools and
+models inventory, the comparison framework, and the first real code of
+the product path, live clients for three public data sources. It is
+not the whole product. Section (e) of PRODUCT_PLAN.md names the phases
+that remain, each with acceptance criteria, and I would rather ship a
+verified foundation with named gaps than a large claim with none.
+
+### What I built today
+
+**PRODUCT_PLAN.md.** The product in one page: an agent product for
+genomic evidence work that runs real tasks end to end on live public
+data, with permission gates, verified citations, and measured
+reliability, used through a web app. Then the problems it attacks,
+each mapped to the mechanism that answers it: hallucinated citations,
+unverified answers, no recovery, no audit trail, agents acting
+without approval, demos on fake data, confident answers on
+insufficient evidence, cost and model opacity. Then the full v2
+architecture, the build phases with acceptance criteria (live LLM
+run, real-data wiring, RAG and citation checking, web app, comparison
+run, deployment), and the documentation map that binds this journal,
+the inventory, the comparison document, and the harness results files
+into one record.
+
+**TOOLS_AND_MODELS.md.** Every tool, model, library, and data source
+the v2 product uses or will use, each with what it does here, why it
+was chosen, what was rejected and why, and its key and cost facts.
+Every row is marked IN USE NOW or PLANNED FOR V2, and the two
+genuinely undecided pieces, vector retrieval and the web app stack,
+are recorded as criteria for a decision that has not been made,
+because writing down a choice I have not made would be the exact kind
+of claim this project refuses to make.
+
+**COMPARISON.md.** The market comparison framework, written before
+any comparison run so the rules cannot be bent around results: the
+same real bioinformatics tasks run three ways (a single plain LLM
+call with no tools; an LLM with tools but no recovery and no gates;
+full Aegis), scored on task success, citation correctness checked
+against the source records, decline correctness on insufficient
+evidence tasks, recovery rate on real failures, approval gate
+violations (acceptable number: zero), and cost and latency per task.
+Task design rules ban any task shaped around Aegis internals, and
+ground truth comes from the sources, with ClinVar reclassifications
+used deliberately. The document states plainly, and I repeat it here:
+no comparison numbers exist yet, and none may be claimed until that
+harness runs.
+
+**The real-data layer, `src/aegis/data/` (752 lines across seven
+modules, plus 315 lines of tests in three new test files).**
+Live clients, standard library only, written plainly:
+
+- `pubmed.py`: E-utilities esearch plus efetch. Returns PMID, title,
+  abstract, journal, and year per article.
+- `clinvar.py`: E-utilities esearch plus esummary. Returns the
+  versioned accession, the HGVS title, the germline classification,
+  review status, last evaluated date, and trait per variation.
+- `gnomad.py`: the GraphQL variant lookup. Returns genome and exome
+  allele count, allele number, and allele frequency for one variant
+  in a named dataset.
+- Shared modules: `errors.py` (one typed DataSourceError with a kind:
+  http_error, timeout, network_error, parse_error, not_found,
+  api_error), `http.py` (one injectable urllib transport, the same
+  pattern as the model adapters), and `cache.py` (one JSON file per
+  request under a caller chosen directory).
+
+The rules every client follows, because the product depends on them:
+every record carries the URL of its own page at the source, so any
+citation built on it can be checked; a failed request raises a typed
+error and never comes back as a silent empty result (an empty list
+means the source genuinely matched nothing, and those are different
+facts); every record states whether it came from a live fetch or the
+cache, and when the live fetch happened, because ClinVar
+reclassifies and "when did you read this" is part of the evidence.
+
+### Decisions I made today, and what I considered instead
+
+**Standard library only, again.** The model adapters set this pattern
+in Phase 2 and it holds here: the E-utilities and GraphQL wire
+formats are small and stable, tests inject a stub transport and
+replay recorded responses, and there is no SDK between the reader
+and the wire. Rejected: requests or httpx as the transport, and the
+provider SDK approach generally. Revisit only if a source ever needs
+something urllib cannot do, and record it here if that day comes.
+
+**Tests replay recorded real responses, and the fixtures say so.**
+Each fixture in tests/fixtures/data/ is a real response captured from
+the real API today, with the query and date recorded in that
+directory's README. Rejected: hand written invented JSON that looks
+like a ClinVar record. A parser tested against invented shapes proves
+nothing about the real source, and this project's fixtures rule is
+the same as its results rule: real or labelled, never passed off.
+
+**gnomAD dataset is a parameter, defaulting to gnomad_r4.** Releases
+differ and frequencies differ between them, so the dataset is named
+on every record and in its source URL rather than buried. This choice
+earned its keep within the hour: the smoke variant below exists in
+gnomad_r2_1 and genuinely does not exist in gnomad_r4, and the client
+surfaced that as a typed not_found instead of a zero frequency. That
+distinction is worth money in this domain.
+
+**The cache stores raw response text, keyed by request, with the
+fetch timestamp.** Rejected: storing parsed records (a parser change
+would poison old evidence) and any expiry policy inside the cache
+(freshness is a caller decision, made with the timestamp in view).
+
+**Vector retrieval and the web stack are criteria, not choices.**
+Both are recorded in TOOLS_AND_MODELS.md as decisions to be made at
+the phase that needs them, judged against written criteria.
+Rejected: naming a vector store or a web framework today to make the
+plan look complete. A plan with two honest open decisions is worth
+more than a plan with two invented ones.
+
+### Commands I used today
+
+- Fixture capture, one curl per response, into tests/fixtures/data/:
+  `curl "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=BRCA1+variant&retmax=2&retmode=json"`,
+  the matching efetch for PMID 43015897 in XML, the ClinVar esearch
+  for `BRCA1[gene]` and esummary for variation 5042465, and two
+  `curl -X POST https://gnomad.broadinstitute.org/api` GraphQL calls
+  for variant 1-55516888-G-GA in datasets gnomad_r2_1 and gnomad_r4.
+- Tests, data layer first, then the whole suite at the end of the
+  tranche: `.venv/bin/python -m pytest tests/test_data_pubmed.py
+  tests/test_data_clinvar.py tests/test_data_gnomad.py -q`, then
+  `.venv/bin/python -m pytest -q` for the full suite.
+- Live smoke checks: a short Python script run with the repo venv,
+  calling the built clients directly (`search_pubmed`,
+  `search_clinvar`, `lookup_variant`) against the live APIs with a
+  throwaway cache directory under /tmp. Results below.
+
+### Live smoke checks, run 2026-11-13, and what came back
+
+One query per source, through the built clients, small on purpose.
+
+- **PubMed, search "BRCA1 variant", top 2:** two live records.
+  PMID 43015897, "Patterns of metastasis according to germline
+  BRCA1/2 mutation status in patients with HER2-negative metastatic
+  breast cancer", and PMID 43015421, a saturation genome editing
+  study of BRCA1. Both with source URLs, fetch timestamp
+  2026-11-13T19:27:28Z, from_cache False.
+- **ClinVar, search "BRCA1[gene]", top 2:** two live records, both
+  Pathogenic. VCV005042465.1, NM_007294.4(BRCA1):c.711del
+  (p.Glu237fs), and VCV005042298.1, NM_007294.4(BRCA1):c.2814_2817dup,
+  each with its ClinVar variation page URL.
+- **gnomAD, and this one taught something:** in the first smoke run,
+  the lookup for 1-55516888-G-GA in gnomad_r2_1 timed out at the 60
+  second budget and came back as a typed timeout error, while the
+  same variant in gnomad_r4 answered inside the same run with the
+  real not_found described above. A retry of the r2_1 lookup with a
+  90 second budget answered in about 7 seconds: genome allele
+  frequency 0.004971002485501243 (allele count 156, allele number
+  31382), exome allele frequency 0.0009436169383139671, fetched at
+  2026-11-13T19:28:45Z. A second identical call in that run was
+  served from the cache with the same fetch timestamp, which proves
+  the cache path against a live source, not only against fixtures.
+  The lesson, recorded for Phase 2: the gnomAD API's latency varies
+  wildly, a typed timeout with a retry is the correct behaviour, and
+  a silent empty result would have hidden a real answer. That is the
+  recovery argument, happening on real infrastructure, on day one.
+
+### The honest state after this tranche
+
+- **Still scripted and local:** the v1 runtime eval. Its 30 of 30
+  versus 17 of 30 numbers measure the runtime on local tasks with a
+  scripted planner, exactly as the README's limits section says. The
+  live planner run is Phase 1 of the new plan and has not happened.
+- **Now real:** the data layer. PubMed, ClinVar, and gnomAD records
+  in the product path come from the live public APIs, with source
+  URLs, timestamps, cache provenance, and typed failures, proven by
+  20 new fixture tests and the live smoke checks above.
+- **Written but not yet run:** the comparison framework. No
+  comparison numbers exist, and none are claimed anywhere.
+- **What is next, and what it needs:** Phase 1, the live LLM run,
+  needs a live Anthropic API key in the environment, which only the
+  user can supply (through the secure capture, never through chat or
+  the repo). With that key, the same 30 tasks rerun on a real planner
+  and the product gets its first live model numbers. Phase 2 then
+  wires today's data clients into the registry as read scope tools
+  and builds the first real task set on live data.
