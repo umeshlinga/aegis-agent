@@ -273,6 +273,22 @@ prompt, and read a sourced summary whose citations all resolve; the
 stack decision and its reasons are recorded in TOOLS_AND_MODELS.md
 and the journal before the first app code is written.
 
+Status note (Tranche 3, 2026-11-13): built as a local product
+prototype, ahead of the Phase 2 wiring, over the evidence core
+rather than the agent loop. The stack decision: standard library
+HTTP server only, server side rendering, no framework dependency,
+consistent with the trace explorer; the reasons are in the journal.
+Built: the question form (gene, optional variant), the live run
+through dossier building, citation checking, and the gate, the
+sourced report page (verdict first, evidence grouped by source,
+per-source counts, fetch times, live versus cache marks, removed
+citations, sources that did not answer), plain words error handling
+with form re-rendering, and the session history on the home page.
+Not in this surface, because they belong to the agent loop rather
+than the evidence core: the live run view over the trace stream and
+approval prompts for gated steps, and the LLM summary (which still
+needs a live API key). Deployment is still pending: that is Phase 6.
+
 **Phase 5: the comparison run.**
 Scope: execute COMPARISON.md exactly as written: same real tasks,
 three configurations (plain LLM, tools without recovery or gates,

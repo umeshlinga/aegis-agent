@@ -236,6 +236,22 @@ The smoke test runs a two-step task (read a note, append a line to it)
 through the planner, the permissioned registry, verification,
 checkpointing, and tracing, then reads the trace back and checks it.
 
+## Run the product
+
+```bash
+python -m aegis.webapp   # then open http://127.0.0.1:8770/
+```
+
+The web app is the evidence core as a local product. Type a gene
+(and optionally one variant id), and it builds a real evidence
+report from live ClinVar, PubMed, and gnomAD records: the verdict
+first (answerable, with the counts, or declined, with the reason),
+then the verified evidence grouped by source with a link to each
+record, when it was fetched, and whether that copy was live or from
+the local cache. Reports from the session are listed on the home
+page and link back to their result pages. Public data only; history
+is kept in memory for the session, with no accounts and no database.
+
 ## Status
 
 Phase 1: scaffold, agent core, permissioned registry, recovery engine,

@@ -717,3 +717,123 @@ a small follow up, not a rewrite.
 - **Still pending wiring:** Phase 2, the data clients as registry
   tools in the agent loop, with checker outcomes recorded in traces
   and the Phase 3 acceptance run on that task set.
+## V2 Day 3: the product web app over the evidence core
+
+### What I built today
+
+The product surface, at last: `src/aegis/webapp/`, a local web app
+that a person can open and use, runnable as `python -m aegis.webapp`
+(port 8770, and it prints the URL on start). Three files, each with
+one job. `pages.py` renders every page as HTML strings in one place.
+`server.py` holds the routes, the form validation, the in-memory
+session history, and the one function that runs a question through
+the evidence core: build the dossier, check the citations, apply
+the gate, store the report. `__main__.py` is the command, binding
+the same disk cache the evidence command line uses.
+
+The flow a person sees: the home page says what Aegis is in one
+line (an evidence agent for genomic variant research that answers
+only with verified sources or declines), offers a gene field and an
+optional variant field with the gnomAD form as the hint, and lists
+the reports this session has produced. Submitting runs the real
+evidence core against live PubMed, ClinVar, and gnomAD, then lands
+on the report page: the verdict at the top with its reason, the
+verified evidence grouped by source with record titles, identifiers,
+clickable source URLs, summaries, fetch times, and live versus cache
+marks, the citations the checker removed with their reasons, and any
+source that did not answer. A footer on every page says plainly
+that this is a local product prototype, public data only, history
+in memory, no accounts, no database.
+
+Error handling got the same care as the happy path, because a
+product is judged at its edges. An empty gene and a badly formatted
+variant each re-render the form with the problem stated in words
+and the typed values kept, so fixing the input is one edit. A
+source failing inside the core never reaches the page as an error
+at all: the dossier builder records it, and the report page shows
+it under "Sources that did not answer". A failure outside that
+shape is caught by the handler and shown as a plain message. There
+is no stack trace page anywhere in this app.
+
+All externally sourced text is escaped on the way into the page.
+Titles and abstracts come from live APIs; they are untrusted input
+that happens to be text, and treating them as HTML would be a
+standing invitation to anyone who can get markup into a record.
+
+### Decisions I made today, and what I considered instead
+
+**Standard library only, again.** I considered Flask, which the
+plan's stack decision point would have allowed, and a small
+JavaScript front end. Both were rejected for the same reason the
+explorer is stdlib: this repo runs anywhere Python runs, with no
+dependency to install, pin, or break, and the product's value is in
+the evidence pipeline behind the page, not in the page machinery.
+Server side rendering, no build step, no framework. If a later
+phase needs live streaming of a run, that is a reason to revisit
+this, recorded here so the revisit is a decision, not drift.
+
+**POST, redirect, GET.** A successful submit answers with a 303 to
+the report's own URL. The report is then a page a person can
+bookmark, reload, and link from the history list, and reloading it
+never re-runs the evidence build.
+
+**History in memory, on purpose.** The session history is a list on
+the server object with a lock (the server is threaded). I did not
+add a database or local storage: the plan's deployment phase is
+where persistence would be decided, and a prototype that pretends
+to remember more than it does would be dishonest in a way this
+project keeps refusing to be. The pages say the history clears
+when the server stops.
+
+**Validation at the form boundary.** The gene must be one symbol;
+the variant must be a gnomAD id or an HGVS string, the two shapes
+the evidence layer actually understands. Anything else is refused
+with the expected form shown, instead of being passed to three
+live sources to be misread three different ways.
+
+**The builder is injected, not imported by the handler.** The
+handler takes a dossier builder callable; production binds the
+evidence core's builder with the cache, and tests bind stubs. That
+one seam is what lets the whole HTTP surface be tested with zero
+network while the real checker and gate still run.
+
+### Commands I used today
+
+- Tests as I built: `.venv/bin/python -m pytest tests/test_webapp.py
+  -q` (6 passed: form rendering, an answerable page with grouped
+  evidence and verdict, a thin dossier showing the decline reason,
+  validation re-rendering, history listing, the plain 404 page).
+- Full suite: `.venv/bin/python -m pytest -q`.
+- Live verification: started the real server with `.venv/bin/python
+  -m aegis.webapp --port 8770`, then drove it with an HTTP client
+  script: GET the home page, POST gene BRCA1 with no variant to
+  /query exactly as the form does, follow the redirect, and read
+  the result page; then GET the home page again for the history.
+
+### The live verification, and what came back
+
+The home page loaded with the form in it. The BRCA1 submission
+redirected to /report/1, and that page carried the verdict
+Answerable, ClinVar and PubMed groups, 10 real evidence links
+(PubMed record pages and ClinVar variation pages), fetch times,
+and live fetch marks on every item: this run fetched live, the
+cache being empty at the start, which the page stated honestly
+rather than claiming cache provenance it did not have. The home
+page afterwards listed the BRCA1 report with its verdict and a
+link back to /report/1. So the verification ran against live data,
+not cache, and the product worked end to end through its own form.
+
+### The honest state after this tranche
+
+- **Now real:** a usable local product over the evidence core. A
+  person who has never seen this repo can open it, ask a real
+  question, and read a checked, sourced report or an honest
+  decline, with every number on the page traceable to a record.
+- **Still pending the key:** the LLM summary layer that writes
+  prose on top of a verified dossier. Until there is a live API
+  key, the report page shows the evidence and the verdict without
+  a model-written summary, and says nothing it cannot source.
+- **Still pending:** public deployment, which is Phase 6 of the
+  plan, and the agent loop surfaces (live run view, approval
+  prompts) that belong to Phase 2 wiring, not to this surface.
+  PRODUCT_PLAN.md Phase 4 status now records this split.
