@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-agent"
+version = "0.1.0"
+description = "Aegis: a permissioned tool-using agent runtime with checkpointed recovery, a multi-LLM router, full tracing, and an eval harness."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+# Real provider adapters land in Phase 2 behind the ModelAdapter interface.
+# anthropic = ["anthropic>=0.40"]
+# openai = ["openai>=1.50"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

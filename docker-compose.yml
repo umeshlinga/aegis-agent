@@ -1,0 +1,29 @@
+# Aegis local stack (skeleton, Phase 1).
+# Phase 1 runs fully local with the scripted fake model adapter: no API keys needed.
+# Phase 2 adds provider keys through .env and a trace explorer service.
+
+services:
+  aegis:
+    build: .
+    working_dir: /app
+    volumes:
+      - .:/app
+      - traces:/app/traces
+      - checkpoints:/app/checkpoints
+    environment:
+      # AEGIS_MODEL_MODE: "fake" (default, deterministic, no keys) or "live" (Phase 2)
+      AEGIS_MODEL_MODE: ${AEGIS_MODEL_MODE:-fake}
+      # Provider keys are read from .env in live mode only. Never commit .env.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    command: python -m pytest -q
+
+  # trace-explorer:
+  #   Phase 3: read-only web UI over the JSONL trace store in ./traces.
+  #   build: ./trace_explorer
+  #   ports: ["8080:8080"]
+  #   volumes: [traces:/data/traces:ro]
+
+volumes:
+  traces:
+  checkpoints:
