@@ -56,6 +56,6 @@ Prices are list prices checked in November 2026 and live in `llm/base.py` (`DEFA
 | Prometheus | `/metrics`, compose service | Run counts by status, event counters, total LLM cost, pending approvals |
 | numpy, scipy | metrics | Wilson intervals, exact McNemar, Mann-Whitney AUROC, Platt scaling, bootstrap |
 | matplotlib | eval charts | Static PNGs embedded in the HTML report |
-| pytest, pytest-asyncio | 46 tests | Unit, integration, real-browser |
+| pytest, pytest-asyncio | 52 tests | Unit, integration, real-browser |
 | Docker, docker compose | packaging | API + Jaeger + Prometheus in one command |
 | GitHub Actions | CI | Tests + offline eval quality gate (fails the build if Aegis success under faults < 0.95) |

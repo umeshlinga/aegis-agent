@@ -16,11 +16,13 @@ import re
 from types import SimpleNamespace
 
 from .company import workload as company
+from .llm_only import workload as llm_only
 from .variant import workload as variant
 
 WORKLOADS = {
     "variant": SimpleNamespace(build=variant.build, register_tools=variant.register_tools),
     "company": SimpleNamespace(build=company.build, register_tools=company.register_tools),
+    "llm_only": SimpleNamespace(build=llm_only.build, register_tools=llm_only.register_tools),
 }
 
 
@@ -180,7 +182,29 @@ def h_company_email(req):
                                f"Reach me at sales@example.org."})
 
 
+def h_raw_llm(req):
+    """Offline stand-in for 'ask the model directly': confident, sometimes wrong,
+    and cites a mix of real fixture PMIDs and invented ones, which is the
+    pattern the live comparison is designed to measure."""
+    c = _content(req)
+    v = re.search(r"variant (\S+)", c).group(1)
+    from .variant.fixtures import fixtures
+
+    d = fixtures(0).get(v) or {}
+    r = _roll(v)
+    truth = d.get("truth", "VUS")
+    guess = truth if r < 0.6 else ("P/LP" if truth != "P/LP" else "B/LB")
+    label = {"P/LP": "Likely pathogenic", "B/LB": "Likely benign", "VUS": "VUS"}[guess]
+    real = [p["pmid"] for p in d.get("papers", [])][:1]
+    fake = [str(31000000 + int(r * 1e6))] if r < 0.7 else []
+    cites = [{"pmid": p, "claim": "functional study"} for p in real + fake]
+    return json.dumps({"classification": label, "confidence": 0.9, "gene": (d.get("vep") or {}).get("gene_symbol"),
+                       "protein_change": (d.get("vep") or {}).get("protein_short"), "citations": cites,
+                       "reasoning": "offline stand-in"})
+
+
 def register_offline_handlers(p) -> None:
+    p.register("raw_llm_classify", h_raw_llm)
     for name, fn in {
         "variant_plan": h_variant_plan, "lit_triage": h_lit_triage, "support_judge": h_support_judge,
         "variant_report": h_variant_report, "reflect": h_reflect, "clinvar_page_extract": h_null_page,

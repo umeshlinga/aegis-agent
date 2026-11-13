@@ -21,7 +21,7 @@ aegis doctor
 #   expect: ensembl OK, ncbi OK, gnomad OK, and "llm fast/balanced/strong OK" with a tiny cost each
 
 # 5. Tests and offline eval (no money spent)
-pytest -q                                            # expect: 46 passed
+pytest -q                                            # expect: 52 passed
 aegis eval --mode offline --n 60                     # opens nothing; report at evals/results/latest/report.html
 open evals/results/latest/report.html
 

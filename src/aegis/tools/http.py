@@ -27,7 +27,9 @@ class HostLimiter:
 
     async def wait(self, host: str) -> None:
         rps = self.rates.get(host, self.default)
-        lock = self._locks.setdefault(host, asyncio.Lock())
+        # asyncio locks bind to one event loop; key by loop so a process-wide
+        # limiter also works across separate asyncio.run() calls.
+        lock = self._locks.setdefault((id(asyncio.get_running_loop()), host), asyncio.Lock())
         async with lock:
             now = time.monotonic()
             t = self._next.get(host, now)
@@ -36,12 +38,27 @@ class HostLimiter:
             self._next[host] = max(now, t) + 1.0 / rps
 
 
+_SHARED_LIMITERS: dict[bool, HostLimiter] = {}
+
+
+def shared_limiter(ncbi_has_key: bool) -> HostLimiter:
+    """One limiter per process, shared by every run.
+
+    The first version created a limiter per Http client, i.e. per run. That
+    was fine for one run at a time and wrong for batches: 8 concurrent runs
+    each "respecting" 2.8 req/s add up to ~22 req/s against NCBI, which gets
+    429s and eventually an IP block. Found when adding batch mode (F7)."""
+    if ncbi_has_key not in _SHARED_LIMITERS:
+        _SHARED_LIMITERS[ncbi_has_key] = HostLimiter({"eutils.ncbi.nlm.nih.gov": 9.0 if ncbi_has_key else 2.8,
+                                                      "rest.ensembl.org": 12.0, "gnomad.broadinstitute.org": 4.0})
+    return _SHARED_LIMITERS[ncbi_has_key]
+
+
 class Http:
     def __init__(self, ncbi_has_key: bool = False, timeout_s: float = 30.0, transport=None):
         self.client = httpx.AsyncClient(timeout=timeout_s, headers={"User-Agent": USER_AGENT},
                                         follow_redirects=True, transport=transport)
-        self.limiter = HostLimiter({"eutils.ncbi.nlm.nih.gov": 9.0 if ncbi_has_key else 2.8,
-                                    "rest.ensembl.org": 12.0, "gnomad.broadinstitute.org": 4.0})
+        self.limiter = shared_limiter(ncbi_has_key)
 
     async def close(self) -> None:
         await self.client.aclose()

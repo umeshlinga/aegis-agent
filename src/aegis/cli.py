@@ -140,6 +140,79 @@ async def cmd_eval(a):
         print("quality gate passed")
 
 
+async def cmd_batch(a):
+    from .batch import finish_batch, parse_input, register_batch, run_batch
+
+    rt = _rt(a)
+    parsed = parse_input(a.file, a.include_filtered)
+    name = a.name or os.path.splitext(os.path.basename(a.file))[0]
+    out = a.out or f"data/batches/{name}"
+    print(f"batch '{name}': {len(parsed.variants)} variants, {len(parsed.skipped)} skipped")
+    for raw, why in parsed.skipped[:20]:
+        print(f"  skipped {raw}: {why}")
+    if a.limit:
+        parsed.variants = parsed.variants[: a.limit]
+    register_batch(rt.store, name, a.file, parsed, out)
+    summary = await run_batch(rt, parsed.variants, name, out, a.concurrency, a.phenotype or "", a.browser)
+    finish_batch(rt.store, name, summary)
+    print(json.dumps(summary, indent=2))
+    print(f"open {summary['report']}")
+
+
+def cmd_report(a):
+    from .reports.variant_report import render
+
+    rt = _rt(a)
+    out = a.out or f"data/reports/{a.run_id}.html"
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    with open(out, "w") as f:
+        f.write(render(rt.store, a.run_id))
+    print(f"wrote {out}")
+
+
+async def cmd_watch(a):
+    from .watch import Watchlist, write_digest
+
+    rt = _rt(a)
+    w = Watchlist(rt.store)
+    if a.action == "add":
+        for v in a.variants:
+            w.add(v, a.note or "")
+        print(f"watching {len(w.list())} variants")
+    elif a.action == "remove":
+        for v in a.variants:
+            w.remove(v)
+    elif a.action == "list":
+        for r in w.list():
+            last = r["last"] or {}
+            print(f"{r['variant']:<24} {last.get('label') or '(not checked yet)':<22} {r['note'] or ''}")
+    elif a.action == "changes":
+        for c in w.changes():
+            print(f"{c['variant']}  {c['changes']}")
+    elif a.action == "run":
+        report = await w.run(rt)
+        path = write_digest(report)
+        print(f"checked {report['checked']}, changed {len(report['changed'])}, failed {len(report['failed'])}; digest: {path}")
+
+
+async def cmd_compare(a):
+    from .evals.compare import run_compare
+    from .evals.harness import Case, load_cases, offline_cases
+
+    mode = a.mode or ("live" if Settings().has_llm() else "offline")
+    if a.variants:
+        truths = (a.truth or "").split(",") if a.truth else [None] * len(a.variants)
+        cases = [Case(f"v{i}", v, t or None) for i, (v, t) in enumerate(zip(a.variants, truths))]
+    elif mode == "offline":
+        cases = offline_cases(a.n, 0)
+    else:
+        cases = load_cases(a.cases, "test", a.n)
+    print(f"comparing LLM-alone vs Aegis on {len(cases)} variants (mode={mode})")
+    s = await run_compare(cases, Settings(), mode, a.out, a.concurrency)
+    print(json.dumps({k: s[k] for k in ("n", "llm_only", "aegis", "paired_correct")}, indent=2, default=str))
+    print(f"open {a.out}/compare.html")
+
+
 def cmd_bench_build(a):
     from .evals.build_clinvar import build, download
 
@@ -258,6 +331,21 @@ def main(argv=None) -> None:
     sp.add_argument("--cases", default="evals/data/clinvar_benchmark.jsonl"); sp.add_argument("--calibrate", action="store_true")
     sp.add_argument("--out", default="evals/results/latest"); sp.add_argument("--concurrency", type=int, default=4)
     sp.add_argument("--gate", type=float, default=None, help="fail (exit 1) if aegis success_rate is below this")
+    sp = add("batch", cmd_batch, "curate every variant in a VCF / CSV / TSV (resumable)")
+    sp.add_argument("file"); sp.add_argument("--name"); sp.add_argument("--out"); sp.add_argument("--phenotype")
+    sp.add_argument("--concurrency", type=int, default=4); sp.add_argument("--limit", type=int)
+    sp.add_argument("--include-filtered", action="store_true"); sp.add_argument("--browser", action="store_true",
+                                                                                  help="also run the ClinVar browser cross-check")
+    sp.add_argument("--faults", default="none")
+    sp = add("report", cmd_report, "write the HTML report for a variant run"); sp.add_argument("run_id")
+    sp.add_argument("--out")
+    sp = add("watch", cmd_watch, "watchlist: add / remove / list / run / changes")
+    sp.add_argument("action", choices=["add", "remove", "list", "run", "changes"]); sp.add_argument("variants", nargs="*")
+    sp.add_argument("--note")
+    sp = add("compare", cmd_compare, "head-to-head: frontier LLM alone vs Aegis, scored against ClinVar")
+    sp.add_argument("--cases", default="evals/data/clinvar_benchmark.jsonl"); sp.add_argument("--n", type=int, default=30)
+    sp.add_argument("--variants", nargs="*"); sp.add_argument("--truth", help="comma list of P/LP,B/LB,VUS for --variants")
+    sp.add_argument("--out", default="evals/results/compare"); sp.add_argument("--concurrency", type=int, default=3)
     sp = add("bench-build", cmd_bench_build, "build the ClinVar temporal-split benchmark")
     sp.add_argument("--source"); sp.add_argument("--out", default="evals/data/clinvar_benchmark.jsonl")
     sp.add_argument("--cutoff", default="2024-06-30"); sp.add_argument("--n-per-class", type=int, default=40)

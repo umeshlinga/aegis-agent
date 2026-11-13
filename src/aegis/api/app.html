@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis · variant evidence you can verify</title>
+<style>
+  :root{--ink:#151a22;--muted:#5d6675;--line:#e3e6eb;--bg:#f6f7f9;--panel:#fff;--accent:#2b59c3;
+        --p:#a32222;--lp:#a34a22;--vus:#52514e;--lb:#1d6b43;--b:#145536;--ie:#5a3d9a;
+        --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;font:14.5px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--panel);border-bottom:1px solid var(--line)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .top{display:flex;align-items:center;gap:16px;padding:16px 0 0}
+  .brand{font-weight:750;font-size:19px;letter-spacing:.2px}
+  .tag{color:var(--muted)}
+  .mode{margin-left:auto;font-family:var(--mono);font-size:12px;padding:2px 9px;border-radius:10px;background:#eef2fb;color:var(--accent)}
+  nav{display:flex;gap:4px;margin-top:12px}
+  nav button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;font:inherit;color:var(--muted);cursor:pointer}
+  nav button.on{color:var(--ink);border-color:var(--accent);font-weight:600}
+  nav a{margin-left:auto;align-self:center;color:var(--muted);font-size:13px}
+  section{display:none;padding:22px 0}section.on{display:block}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  h2{font-size:16px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+  input[type=text],input[type=file]{font:inherit;border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:#fff;min-width:260px}
+  button.go{font:inherit;font-weight:650;border:0;border-radius:8px;padding:9px 16px;background:var(--accent);color:#fff;cursor:pointer}
+  button.ghost{font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:#fff;cursor:pointer}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:8px;border-bottom:1px solid #eceef2;text-align:left;vertical-align:top}
+  th{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .mono{font-family:var(--mono);font-size:12.5px}
+  .badge{display:inline-block;padding:2px 10px;border-radius:12px;font-weight:650;font-size:13px;background:#eef0f3}
+  .Pathogenic{background:#fde8e8;color:var(--p)}.Likely.pathogenic{background:#fdeee6;color:var(--lp)}
+  .VUS{background:#f1f1ef;color:var(--vus)}.Likely.benign{background:#e6f3ec;color:var(--lb)}.Benign{background:#e1f1e8;color:var(--b)}
+  .insufficient_evidence{background:#f3eefb;color:var(--ie)}
+  .result{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .crit{font-family:var(--mono);font-size:12.5px}
+  .muted{color:var(--muted)}.err{color:var(--p)}
+  .steps{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .step{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:#eef0f3;color:var(--muted)}
+  .step.succeeded{background:#e5f4ea;color:#1f8a4c}.step.running{background:#eef2fb;color:var(--accent)}
+  .step.failed{background:#fbe9e7;color:var(--p)}.step.skipped{opacity:.6}
+  .feature{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .feature div{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
+  .feature b{display:block;margin-bottom:2px}
+  iframe{width:100%;height:80vh;border:1px solid var(--line);border-radius:12px;background:#fff}
+  @media (max-width:800px){.result,.feature{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top"><span class="brand">Aegis</span><span class="tag">variant evidence you can verify</span><span class="mode">{{MODE}}</span></div>
+  <nav>
+    <button class="on" data-t="curate">Curate a variant</button>
+    <button data-t="batch">Batch (VCF)</button>
+    <button data-t="watch">Watchlist</button>
+    <button data-t="compare">LLM vs Aegis</button>
+    <a href="/explorer">Run explorer →</a>
+  </nav>
+</div></header>
+<main class="wrap">
+
+<section id="curate" class="on">
+  <div class="card">
+    <h2>Curate one variant</h2>
+    <p class="sub">GRCh38, written CHROM-POS-REF-ALT. Aegis gathers population, consequence, constraint and literature evidence in parallel, verifies every citation, scores ACMG criteria in code, and declines when evidence is thin.</p>
+    <div class="row">
+      <div><label>Variant</label><input type="text" id="v" placeholder="17-43045712-T-C"></div>
+      <div><label>Phenotype (optional)</label><input type="text" id="ph" placeholder="hereditary breast and ovarian cancer"></div>
+      <button class="go" onclick="curate()">Curate</button>
+    </div>
+    <div id="cur"></div>
+  </div>
+  <div class="feature">
+    <div><b>No invented citations</b>Every quote must appear verbatim in the cited abstract, and two models from different families must agree it supports the claim.</div>
+    <div><b>Auditable calls</b>The class is computed from ACMG criteria in code. Every point links to its source. Literature evidence is capped at Supporting.</div>
+    <div><b>Knows when to stop</b>Says "insufficient evidence" instead of guessing, and keeps working when a data source is down.</div>
+  </div>
+</section>
+
+<section id="batch">
+  <div class="card">
+    <h2>Upload a VCF or variant list</h2>
+    <p class="sub">VCF / VCF.gz (multi-allelic sites split, FILTER≠PASS skipped) or CSV/TSV with a <span class="mono">variant</span> column. Each variant is a durable run; a crash mid-batch resumes where it stopped.</p>
+    <div class="row">
+      <div><label>File</label><input type="file" id="file" accept=".vcf,.gz,.csv,.tsv,.txt"></div>
+      <div><label>Batch name</label><input type="text" id="bname" placeholder="proband_042"></div>
+      <div><label>Phenotype (optional)</label><input type="text" id="bph"></div>
+      <button class="go" onclick="upload()">Start batch</button>
+    </div>
+    <div id="bmsg" class="muted" style="margin-top:8px"></div>
+  </div>
+  <div class="card"><h2>Batches</h2><table id="btab"></table></div>
+</section>
+
+<section id="watch">
+  <div class="card">
+    <h2>Watch variants for reclassification</h2>
+    <p class="sub">Aegis re-curates watched variants on a schedule (or when you press Check now) and records what changed: classification, points, criteria, new papers, ClinVar.</p>
+    <div class="row">
+      <div><label>Variant</label><input type="text" id="wv" placeholder="13-32340300-GT-G"></div>
+      <div><label>Note</label><input type="text" id="wn" placeholder="family 7, BRCA2"></div>
+      <button class="go" onclick="watchAdd()">Watch</button>
+      <button class="ghost" onclick="watchRun()">Check now</button>
+    </div>
+  </div>
+  <div class="card"><h2>Watching</h2><table id="wtab"></table></div>
+  <div class="card"><h2>Changes</h2><table id="ctab"></table></div>
+</section>
+
+<section id="compare">
+  <p class="sub">The latest head-to-head from <span class="mono">aegis compare</span>: the strongest model asked directly, vs Aegis, on the same variants, scored against ClinVar, with every PMID the model cites looked up in PubMed.</p>
+  <iframe src="/compare"></iframe>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$(b.dataset.t).classList.add('on');refresh();});
+async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(await r.text());return r.json();}
+const badge=l=>l?`<span class="badge ${esc(l)}">${esc(l)}</span>`:'';
+
+let curId=null,curTimer=null;
+async function curate(){
+  const v=$('v').value.trim(); if(!v) return;
+  try{const r=await j('/api/runs',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({workload:'variant',input:{variant:v,phenotype:$('ph').value,use_browser:true}})});
+    curId=r.run_id; clearInterval(curTimer); curTimer=setInterval(showRun,1500); showRun();
+  }catch(e){$('cur').innerHTML=`<p class="err">${esc(e.message).slice(0,300)}</p>`;}
+}
+async function showRun(){
+  const r=await j('/api/runs/'+curId); const steps=Object.values(r.steps);
+  const order=['plan','consequence','population','constraint','clinical','literature','browser_xcheck','gather_done','verify','classify','report','final','reflect'];
+  steps.sort((a,b)=>order.indexOf(a.step_id)-order.indexOf(b.step_id));
+  let h=`<div class="steps">${steps.map(s=>`<span class="step ${s.status}">${s.step_id}</span>`).join('')}</div>`;
+  if(['succeeded','failed','cancelled'].includes(r.status)) clearInterval(curTimer);
+  if(r.status==='failed') h+=`<p class="err">${esc(r.error)}</p>`;
+  const o=r.result&&r.result.output;
+  if(o){
+    h+=`<div class="result"><div><div style="font-size:18px;font-weight:650">${esc(o.gene||'')} <span class="mono">${esc(o.variant)}</span></div>
+      <p>${badge(o.classification)} <b>${esc(o.points)}</b> points</p>
+      <table>${(o.criteria||[]).map(c=>`<tr><td class="crit">${esc(c.code)}</td><td>${c.points>0?'+':''}${c.points}</td><td>${esc(c.rationale)}</td></tr>`).join('')}</table></div>
+      <div><p>${esc(o.report||'')}</p><p class="muted">${(o.citations||[]).length} verified citation(s), ${esc(o.rejected_evidence)} rejected · ClinVar: ${esc(o.clinvar&&o.clinvar.classification||'–')}</p>
+      <p><a href="/reports/run/${r.run_id}" target="_blank">Open the full report →</a> · <a href="/explorer">trace</a></p></div></div>`;
+  } else h+=`<p class="muted">Status: ${esc(r.status)}…</p>`;
+  $('cur').innerHTML=h;
+}
+
+async function upload(){
+  const f=$('file').files[0]; if(!f) return;
+  const fd=new FormData(); fd.append('file',f); fd.append('name',$('bname').value); fd.append('phenotype',$('bph').value);
+  $('bmsg').textContent='uploading…';
+  try{const r=await fetch('/api/batches',{method:'POST',body:fd}); const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||JSON.stringify(d));
+    $('bmsg').textContent=`started ${d.name}: ${d.variants} variants, ${d.skipped.length} skipped`; refresh();
+  }catch(e){$('bmsg').innerHTML=`<span class="err">${esc(e.message).slice(0,300)}</span>`;}
+}
+async function watchAdd(){
+  try{await j('/api/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({variant:$('wv').value,note:$('wn').value})});$('wv').value='';refresh();}
+  catch(e){alert(e.message);}
+}
+async function watchRun(){await j('/api/watch/run',{method:'POST'}); setTimeout(refresh,1500);}
+async function watchDel(v){await j('/api/watch/'+encodeURIComponent(v),{method:'DELETE'}); refresh();}
+
+async function refresh(){
+  if($('batch').classList.contains('on')){
+    const bs=await j('/api/batches');
+    $('btab').innerHTML='<tr><th>Batch</th><th>Variants</th><th>Progress</th><th>Calls</th><th></th></tr>'+bs.map(b=>`<tr>
+      <td class="mono">${esc(b.name)}<div class="muted">${esc(b.source)}</div></td><td>${b.variants} <span class="muted">(${b.skipped} skipped)</span></td>
+      <td>${Object.entries(b.progress).map(([k,v])=>`${k}: ${v}`).join(' · ')}</td>
+      <td>${b.summary?Object.entries(b.summary.classifications).map(([k,v])=>`${badge(k)} ${v}`).join(' '):'running…'}</td>
+      <td><a href="/batches/${encodeURIComponent(b.name)}" target="_blank">report</a> · <a href="/api/batches/${encodeURIComponent(b.name)}/results.tsv">TSV</a></td></tr>`).join('');
+  }
+  if($('watch').classList.contains('on')){
+    const w=await j('/api/watch');
+    $('wtab').innerHTML='<tr><th>Variant</th><th>Current call</th><th>Last checked</th><th>Note</th><th></th></tr>'+w.watching.map(x=>`<tr>
+      <td class="mono">${esc(x.variant)}</td><td>${x.last?badge(x.last.label)+' '+esc(x.last.points)+' pts':'<span class="muted">not checked yet</span>'}</td>
+      <td>${x.last_checked?new Date(x.last_checked*1000).toLocaleString():'–'}</td><td>${esc(x.note)}</td>
+      <td>${x.last_run_id?`<a href="/reports/run/${x.last_run_id}" target="_blank">report</a> · `:''}<a href="#" onclick="watchDel('${esc(x.variant)}');return false">remove</a></td></tr>`).join('');
+    $('ctab').innerHTML='<tr><th>When</th><th>Variant</th><th>What changed</th><th>Reports</th></tr>'+(w.changes.map(c=>`<tr>
+      <td>${new Date(c.ts*1000).toLocaleString()}</td><td class="mono">${esc(c.variant)}</td>
+      <td>${c.changes.map(ch=>'old' in ch?`<b>${esc(ch.field)}</b>: ${esc(ch.old)} → ${esc(ch.new)}`:`<b>${esc(ch.field)}</b>: +${esc((ch.added||[]).join(', '))} ${ch.removed&&ch.removed.length?'−'+esc(ch.removed.join(', ')):''}`).join('<br>')}</td>
+      <td><a href="/reports/run/${c.old_run_id}" target="_blank">before</a> · <a href="/reports/run/${c.new_run_id}" target="_blank">after</a></td></tr>`).join('')||'<tr><td colspan=4 class="muted">No changes recorded yet.</td></tr>');
+  }
+}
+setInterval(refresh,4000);
+</script>
+</body>
+</html>

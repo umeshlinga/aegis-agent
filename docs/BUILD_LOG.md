@@ -84,13 +84,25 @@ Verified over HTTP: started a variant and a company run with `curl`, watched the
 
 ## Phase 9. Tests, packaging, CI
 
-46 tests (`pytest -q`, ~55s): engine guarantees (parallelism, retry, permanent errors, degradation, skip conditions, approvals, cancel, crash mid-step, stale CAS, exactly-once effect), resilience and router (Retry-After, breaker half-open, loop guard, budget, fallback, repair→escalate→fail, per-run cache, voting, JSON extraction, no fallback on permanent errors), domain (ACMG rules, injection, PII, VEP region encoding, protein notation, mocked ClinVar/gnomAD/PubMed parsing, HTTP error mapping, BM25 vs exact tokens, hybrid filters, memory promotion), end to end (offline runs, hallucinated citations rejected, ungrounded numbers repaired, harsh faults and crash recovery, eval harness), real Chrome (ladder recovers late JS and overlay, no-ladder fails, off-site and risky clicks blocked, full company run with approval and exactly-once).
+52 tests (`pytest -q`, ~55s): engine guarantees (parallelism, retry, permanent errors, degradation, skip conditions, approvals, cancel, crash mid-step, stale CAS, exactly-once effect), resilience and router (Retry-After, breaker half-open, loop guard, budget, fallback, repair→escalate→fail, per-run cache, voting, JSON extraction, no fallback on permanent errors), domain (ACMG rules, injection, PII, VEP region encoding, protein notation, mocked ClinVar/gnomAD/PubMed parsing, HTTP error mapping, BM25 vs exact tokens, hybrid filters, memory promotion), end to end (offline runs, hallucinated citations rejected, ungrounded numbers repaired, harsh faults and crash recovery, eval harness), real Chrome (ladder recovers late JS and overlay, no-ladder fails, off-site and risky clicks blocked, full company run with approval and exactly-once).
 
 A test caught F5 (frameshift protein notation).
 
 Packaging: `pyproject.toml` (extras: rag, mcp, otel, dev), `Dockerfile`, `docker-compose.yml` (Aegis + Jaeger + Prometheus), `Makefile`, `.github/workflows/ci.yml` (tests + offline eval gate at 0.95).
 
-## Phase 10 (next, on my machine with keys)
+## Phase 10. From demo to tool I use
+
+**Built:** `batch.py` (VCF/VCF.gz/CSV/TSV parsing with multi-allelic splitting, symbolic/filtered/chrM handling; deterministic run ids so re-running a batch resumes; shared rate limits; `results.tsv`, per-variant reports, batch index page), `reports/variant_report.py` (printable report: classification, criteria with points and sources, raw evidence, verified quotes with PubMed links, rejected evidence with reasons, ClinVar comparison, provenance), `watch.py` (watchlist that re-curates and diffs label, points, criteria, citations, new papers and ClinVar; change history; markdown digest), `workloads/llm_only` + `evals/compare.py` (the strongest model asked directly vs Aegis, every cited PMID looked up in PubMed, scored against ClinVar), `api/app.html` (product web app: curate, batch upload, watchlist, comparison), new endpoints, CLI `batch`, `report`, `watch`, `compare`.
+
+```bash
+aegis batch examples/demo_offline.vcf --mode offline        # 11 variants; 3 skipped with reasons
+aegis batch examples/demo_offline.vcf --mode offline        # again: "already_done": 11
+aegis compare --mode offline --n 30                         # LLM-alone vs Aegis report
+aegis serve                                                 # product app on :8080, ops explorer on /explorer
+```
+52 tests pass. Market research written up in `MARKET.md` (honest conclusion: grounded variant agents are an active field; Aegis's angle is measured reliability, reanalysis, and hard verification).
+
+## Phase 11 (next, on my machine with keys)
 
 1. `aegis doctor` until every line is OK.
 2. `aegis variant 17-43045712-T-C` and nine more variants I know; log every failure in `FAILURES.md` with before/after.

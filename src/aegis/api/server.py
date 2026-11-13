@@ -11,9 +11,10 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel
 
@@ -62,8 +63,156 @@ class Decision(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
+def product_app() -> str:
+    return (Path(__file__).parent / "app.html").read_text().replace("{{MODE}}", MODE)
+
+
+@app.get("/explorer", response_class=HTMLResponse)
 def explorer() -> str:
     return (Path(__file__).parent / "explorer.html").read_text().replace("{{MODE}}", MODE)
+
+
+# ------------------------------------------------------------------ reports
+@app.get("/reports/run/{run_id}", response_class=HTMLResponse)
+def run_report(run_id: str) -> str:
+    from ..reports.variant_report import render
+
+    try:
+        return render(runtime.store, run_id)
+    except KeyError:
+        raise HTTPException(404)
+
+
+# ------------------------------------------------------------------ batches
+@app.post("/api/batches")
+async def create_batch(file: UploadFile = File(...), name: str = Form(""), phenotype: str = Form("")):
+    import re
+    import tempfile
+
+    from ..batch import finish_batch, parse_input, register_batch, run_batch
+
+    raw = await file.read()
+    if len(raw) > 50_000_000:
+        raise HTTPException(413, "file too large (50 MB max)")
+    suffix = "".join(Path(file.filename or "upload.vcf").suffixes) or ".vcf"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(raw)
+    parsed = parse_input(tmp.name)
+    if not parsed.variants:
+        raise HTTPException(400, f"no usable variants; skipped {len(parsed.skipped)}: {parsed.skipped[:5]}")
+    name = re.sub(r"[^A-Za-z0-9_-]", "_", name or Path(file.filename or "batch").stem)[:40] + "-" + str(int(time.time()))[-6:]
+    out = str(Path(settings.db_path).parent / "batches" / name)
+    register_batch(runtime.store, name, file.filename or "", parsed, out)
+
+    async def go():
+        summary = await run_batch(runtime, parsed.variants, name, out, concurrency=3, phenotype=phenotype,
+                                  progress=lambda *_: None)
+        finish_batch(runtime.store, name, summary)
+
+    _spawn(go(), f"batch:{name}")
+    return {"name": name, "variants": len(parsed.variants), "skipped": parsed.skipped[:50]}
+
+
+@app.get("/api/batches")
+def batches():
+    from ..batch import list_batches
+
+    out = []
+    for b in list_batches(runtime.store):
+        statuses = {}
+        from ..batch import run_id_for
+
+        for v in b["variants"]:
+            try:
+                st = runtime.store.get_run(run_id_for(b["name"], v))["status"]
+            except KeyError:
+                st = "queued"
+            statuses[st] = statuses.get(st, 0) + 1
+        out.append({"name": b["name"], "created_at": b["created_at"], "source": b["source"], "status": b["status"],
+                    "variants": len(b["variants"]), "skipped": len(b["skipped"]), "progress": statuses,
+                    "summary": b["summary"]})
+    return out
+
+
+@app.get("/batches/{name}", response_class=HTMLResponse)
+def batch_page_live(name: str) -> str:
+    from ..batch import batch_rows
+    from ..reports.variant_report import batch_page
+
+    try:
+        rows = batch_rows(runtime.store, name)
+    except KeyError:
+        raise HTTPException(404)
+    counts: dict[str, int] = {}
+    for r in rows:
+        if r["status"] == "succeeded":
+            r["report"] = f"/reports/run/{r['run_id']}"
+        k = r["classification"] or ("failed" if r["status"] == "failed" else r["status"])
+        counts[k] = counts.get(k, 0) + 1
+    return batch_page(f"Batch {name}", rows, counts)
+
+
+@app.get("/api/batches/{name}/results.tsv", response_class=PlainTextResponse)
+def batch_tsv(name: str) -> str:
+    from ..batch import batch_rows
+
+    rows = batch_rows(runtime.store, name)
+    cols = ["variant", "gene", "consequence", "hgvsc", "hgvsp", "gnomad_faf95", "revel", "classification", "points",
+            "criteria", "citations", "clinvar", "status", "run_id"]
+    return "\t".join(cols) + "\n" + "\n".join("\t".join("" if r.get(c) is None else str(r.get(c)) for c in cols) for r in rows) + "\n"
+
+
+# ---------------------------------------------------------------- watchlist
+class WatchAdd(BaseModel):
+    variant: str
+    note: str = ""
+
+
+@app.get("/api/watch")
+def watch_list():
+    from ..watch import Watchlist
+
+    w = Watchlist(runtime.store)
+    return {"watching": w.list(), "changes": w.changes(50)}
+
+
+@app.post("/api/watch")
+def watch_add(body: WatchAdd):
+    from ..watch import Watchlist
+
+    try:
+        Watchlist(runtime.store).add(body.variant, body.note)
+    except Exception as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True}
+
+
+@app.delete("/api/watch/{variant}")
+def watch_remove(variant: str):
+    from ..watch import Watchlist
+
+    Watchlist(runtime.store).remove(variant)
+    return {"ok": True}
+
+
+@app.post("/api/watch/run")
+async def watch_run():
+    from ..watch import Watchlist, write_digest
+
+    async def go():
+        rep = await Watchlist(runtime.store).run(runtime, progress=lambda *_: None)
+        write_digest(rep, str(Path(settings.db_path).parent / "watch"))
+
+    _spawn(go(), "watch:run")
+    return {"started": True}
+
+
+@app.get("/compare", response_class=HTMLResponse)
+def compare_page() -> str:
+    for p in (Path("evals/results/compare/compare.html"), Path(settings.db_path).parent / "compare" / "compare.html"):
+        if p.exists():
+            return p.read_text()
+    return "<p style='font-family:sans-serif'>No comparison yet. Run <code>aegis compare</code>.</p>"
 
 
 @app.get("/api/runs")

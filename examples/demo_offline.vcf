@@ -1,0 +1,16 @@
+##fileformat=VCFv4.2
+##source=aegis synthetic demo (fake variants on chr1 for OFFLINE mode only)
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	100000001	.	C	T	50	PASS	.
+chr1	100000038	.	T	C	50	PASS	.
+chr1	100000075	.	A	G	50	PASS	.
+chr1	100000112	.	G	A	50	PASS	.
+chr1	100000149	.	G	A	50	PASS	.
+chr1	100000186	.	A	G	50	PASS	.
+chr1	100000223	.	A	G	50	PASS	.
+chr1	100000260	.	T	C	50	PASS	.
+chr1	100000297	.	A	G	50	PASS	.
+chr1	100000334	.	C	T	50	PASS	.
+chr1	100000371	.	A	G,<DEL>	50	PASS	.
+chr1	100000408	.	T	C	5	LowQual	.
+chrM	100	.	A	G	50	PASS	.

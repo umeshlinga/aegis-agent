@@ -1,0 +1,47 @@
+{
+  "mode": "offline",
+  "n": 30,
+  "llm_only": {
+    "runs_ok": 30,
+    "answered": 30,
+    "declined": 0,
+    "accuracy_answered": 0.6666666666666666,
+    "accuracy_ci": [
+      0.48779725813830266,
+      0.807697044731538
+    ],
+    "correct_over_all": 0.6666666666666666,
+    "mean_cost_usd": 0,
+    "median_secs": 0.01,
+    "citations": 54,
+    "citations_nonexistent": 24,
+    "citations_off_topic": 0,
+    "citation_failure_rate": 0.4444444444444444,
+    "variants_with_a_fake_citation": 24,
+    "mean_confidence_when_wrong": 0.9,
+    "wrong_calls": 10
+  },
+  "aegis": {
+    "runs_ok": 30,
+    "answered": 23,
+    "declined": 7,
+    "accuracy_answered": 0.6956521739130435,
+    "accuracy_ci": [
+      0.49133870939427393,
+      0.8439617197902755
+    ],
+    "correct_over_all": 0.5333333333333333,
+    "mean_cost_usd": 0,
+    "median_secs": 0.03,
+    "citations": 16,
+    "citations_rejected_by_verifier": 0,
+    "citation_failure_rate": 0.0,
+    "wrong_calls": 7
+  },
+  "paired_correct": {
+    "only_b_ok": 4,
+    "only_a_ok": 8,
+    "p_value": 0.3876953125
+  },
+  "date": "2026-11-13"
+}

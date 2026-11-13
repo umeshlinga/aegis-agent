@@ -40,6 +40,12 @@ Every failure becomes a test or an eval case. Entries F1–F6 were found while b
 * **Symptom:** five systems per fault profile, three in the same fallback color, legend over the title.
 * **Fix:** the headline chart compares baseline vs Aegis only; ablations live in the table; legend moved under the title.
 
+### F7. Rate limits were per run, not per process
+* **Symptom:** found in design review while adding batch mode, before it could hit NCBI: each run created its own HTTP client with its own limiter.
+* **Root cause:** a limiter of 2.8 req/s per run is correct for one run and wrong for eight concurrent runs (~22 req/s), which earns 429s and eventually an IP block.
+* **Fix:** one process-wide limiter per host, shared by every run; asyncio locks keyed by event loop so it is also safe across separate `asyncio.run` calls.
+* **Measured:** `Http().limiter is Http().limiter` holds; batch of 11 offline runs with concurrency 3 completes; live NCBI 429 rate to be measured on the first live batch.
+
 ---
 
 ## Found in live runs (real APIs, real models)
