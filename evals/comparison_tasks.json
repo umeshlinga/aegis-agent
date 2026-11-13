@@ -1,0 +1,137 @@
+{
+  "created": "2026-11-13",
+  "notes": "Real bioinformatics evidence tasks for the comparison harness defined in COMPARISON.md. Every task comes from the public record: a gene with a ClinVar and PubMed presence, a variant with records in ClinVar and gnomAD, or a gene whose evidence a live check on the creation date showed to be genuinely thin. No task is shaped around Aegis internals: each one is the question a person doing variant evidence work would ask, and the expected outcome is set from the source records named in its ground truth notes, not from what any configuration produces. Ground truth checked live on 2026-11-13 through the data layer clients in this repo; accessions, PMIDs, and frequencies below are the records those checks returned.",
+  "suite": "aegis-comparison-v1",
+  "tasks": [
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "BRCA1",
+      "ground_truth": "ClinVar holds classified BRCA1 variant records including Pathogenic ones, for example accession VCV005042465.1 (variation 5042465, NM_007294.4(BRCA1):c.711del (p.Glu237fs), classification Pathogenic, last evaluated 2026-09-18), and PubMed holds a large BRCA1 literature (a five record sample on the check date starts at PMID 43023292). Evidence from two independent sources, well above any reasonable bar. Checked 2026-11-13.",
+      "id": "cmp-01-brca1-gene",
+      "question": "What is known about BRCA1, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "BRCA2",
+      "ground_truth": "ClinVar holds classified BRCA2 variant records including Pathogenic ones, for example accession VCV005042478.1 (variation 5042478, NM_000059.4(BRCA2):c.1408G>T (p.Glu470Ter), classification Pathogenic, last evaluated 2026-08-13), and PubMed holds a large BRCA2 literature (five record sample on the check date starts at PMID 43019901). Checked 2026-11-13.",
+      "id": "cmp-02-brca2-gene",
+      "question": "What is known about BRCA2, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "TP53",
+      "ground_truth": "ClinVar holds classified TP53 variant records including Pathogenic ones, for example accession VCV005031077.1 (variation 5031077, NM_000546.6(TP53):c.1028_1035dup, classification Pathogenic, last evaluated 2026-09-14), and PubMed holds one of the largest gene literatures in biology (five record sample on the check date starts at PMID 43023508). Checked 2026-11-13.",
+      "id": "cmp-03-tp53-gene",
+      "question": "What is known about TP53, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "CFTR",
+      "ground_truth": "The variant is the common cystic fibrosis deletion c.1521_1523delCTT (p.Phe508del). ClinVar records carrying this change are classified Pathogenic, for example accession VCV000634837.2 (variation 634837, a complex allele carrying c.1521_1523delCTT, classification Pathogenic, reviewed by expert panel). gnomAD dataset gnomad_r4 holds the variant itself: genome allele frequency 0.00788 (allele count 1200 of 152206), exome allele frequency 0.01235 (allele count 18037 of 1460114), fetched live on the check date. PubMed holds a large CFTR literature. Checked 2026-11-13.",
+      "id": "cmp-04-cftr-f508del",
+      "question": "What is known about variant 7-117559590-ATCT-A in CFTR (the p.Phe508del deletion), and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": "7-117559590-ATCT-A"
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "HBB",
+      "ground_truth": "The variant is the sickle cell change NM_000518(HBB):c.20A>T (p.Glu6Val) on GRCh38. ClinVar records carrying c.20A>T in HBB are classified Pathogenic, for example accession VCV000446747.2 (variation 446747). gnomAD dataset gnomad_r4 holds the variant itself: genome allele frequency 0.01272, exome allele frequency 0.00160, fetched live on the check date. PubMed holds a large HBB and sickle cell literature. Checked 2026-11-13.",
+      "id": "cmp-05-hbb-sickle",
+      "question": "What is known about variant 11-5227002-T-A in HBB (the sickle cell change, c.20A>T), and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": "11-5227002-T-A"
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "MLH1",
+      "ground_truth": "ClinVar holds classified MLH1 records including Pathogenic ones, for example accession VCV005038282.1 (variation 5038282, a Pathogenic copy number record over the MLH1 locus, last evaluated 2025-03-14), alongside single variant records for this Lynch syndrome gene, and PubMed holds a substantial MLH1 literature (five record sample on the check date starts at PMID 43018392). Checked 2026-11-13.",
+      "id": "cmp-06-mlh1-gene",
+      "question": "What is known about MLH1, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "APC",
+      "ground_truth": "ClinVar holds classified APC variant records including Pathogenic ones, for example accession VCV005042405.1 (variation 5042405, NM_000038.6(APC):c.6793C>T (p.Gln2265Ter), classification Pathogenic, last evaluated 2026-07-10), and PubMed holds a large APC literature (five record sample on the check date starts at PMID 43023771). Checked 2026-11-13.",
+      "id": "cmp-07-apc-gene",
+      "question": "What is known about APC, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "LDLR",
+      "ground_truth": "ClinVar holds classified LDLR variant records including Pathogenic ones, for example accession VCV005038269.1 (variation 5038269, NM_000527.5(LDLR):c.1090del (p.Cys364fs), classification Pathogenic, last evaluated 2026-10-06), and PubMed holds a large LDLR literature (five record sample on the check date starts at PMID 43023435). Checked 2026-11-13.",
+      "id": "cmp-08-ldlr-gene",
+      "question": "What is known about LDLR, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "answerable",
+      "gene": "PAH",
+      "ground_truth": "ClinVar holds classified PAH variant records including Pathogenic ones, for example accession VCV005041851.1 (variation 5041851, NM_000277.3(PAH):c.762C>A (p.Phe254Leu), classification Pathogenic, last evaluated 2026-09-01), and PubMed holds a large PAH and phenylketonuria literature (five record sample on the check date starts at PMID 43023390). Checked 2026-11-13.",
+      "id": "cmp-09-pah-gene",
+      "question": "What is known about PAH, and how strong is the evidence?",
+      "task_type": "answerable",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "decline",
+      "gene": "LINC03065",
+      "ground_truth": "Evidence is genuinely thin, verified live on the check date. A ClinVar gene search returns only 3 records, all large copy number records that span the locus rather than variants in the gene itself, for example accession VCV004890972.1 (variation 4890972, a 15q15.3-22.31 copy number record). A PubMed search for the symbol returns 0 records. One source, no literature, no gene level variant evidence: the correct outcome is a decline that names the missing evidence. Checked 2026-11-13.",
+      "id": "cmp-10-linc03065-decline",
+      "question": "What is known about LINC03065, and how strong is the evidence?",
+      "task_type": "decline",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "decline",
+      "gene": "LINC02885",
+      "ground_truth": "Evidence is genuinely thin, verified live on the check date. A ClinVar gene search returns only 4 records, all large copy number records spanning the locus, for example accession VCV000149114.3 (variation 149114, a 22q11.23-12.3 copy number record, last evaluated 2012-02-14). A PubMed search for the symbol returns 0 records. One source, no literature: the correct outcome is a decline. Checked 2026-11-13.",
+      "id": "cmp-11-linc02885-decline",
+      "question": "What is known about LINC02885, and how strong is the evidence?",
+      "task_type": "decline",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "decline",
+      "gene": "LINC02648",
+      "ground_truth": "Evidence is genuinely thin, verified live on the check date. A ClinVar gene search returns 5 records, copy number and single allele records over the locus, for example accession VCV004819222.1 (variation 4819222). A PubMed search for the symbol returns 0 records. One source, no literature, no gene specific evidence base: the correct outcome is a decline. Checked 2026-11-13.",
+      "id": "cmp-12-linc02648-decline",
+      "question": "What is known about LINC02648, and how strong is the evidence?",
+      "task_type": "decline",
+      "variant": null
+    },
+    {
+      "checked": "2026-11-13",
+      "expected_outcome": "decline",
+      "gene": "MIR8071",
+      "ground_truth": "Evidence is genuinely thin, verified live on the check date. A ClinVar gene search returns 0 records for this microRNA gene. A PubMed search returns only 3 records, and they are broad expression profiling papers that mention the gene among many, for example PMID 38518681 and PMID 35055144, not studies of MIR8071 itself. One source, a handful of passing mentions, no classification record at all: the correct outcome is a decline. Checked 2026-11-13.",
+      "id": "cmp-13-mir8071-decline",
+      "question": "What is known about MIR8071, and how strong is the evidence?",
+      "task_type": "decline",
+      "variant": null
+    }
+  ]
+}

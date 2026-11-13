@@ -837,3 +837,159 @@ not cache, and the product worked end to end through its own form.
   plan, and the agent loop surfaces (live run view, approval
   prompts) that belong to Phase 2 wiring, not to this surface.
   PRODUCT_PLAN.md Phase 4 status now records this split.
+
+## V2 Day 4: the comparison harness and the partial run
+
+### What I built today
+
+The market comparison harness from COMPARISON.md, as a new package,
+`src/aegis/comparison/` (642 lines across six modules, plus 255 lines
+of tests in one new test file), and the first real task set it runs
+on. And then I ran the part of the comparison that can honestly run
+today: the full Aegis evidence configuration, on real tasks, against
+live sources. The two LLM configurations did not run, because they
+need a live model API key and this environment does not have one.
+They are registered in the harness as present but blocked, they are
+reported in the results file by name with that reason, and no winner
+is claimed. I want that stated here as plainly as the results file
+states it: this tranche produced Aegis's own numbers on real tasks,
+not a market comparison result.
+
+**The task set, `evals/comparison_tasks.json`, suite
+aegis-comparison-v1, 13 tasks.** Nine answerable, four decline. The
+answerable tasks are genes a variant scientist actually asks about
+(BRCA1, BRCA2, TP53, MLH1, APC, LDLR, PAH) plus two variant tasks
+with verified records behind them: the CFTR p.Phe508del deletion
+(7-117559590-ATCT-A, gnomAD r4 genome allele frequency 0.00788,
+exome 0.01235) and the HBB sickle change (11-5227002-T-A, gnomAD r4
+genome 0.01272, exome 0.00160). Every task carries ground truth notes
+naming the deciding source records (ClinVar accessions, PMIDs,
+gnomAD frequencies) checked live today, 2026-11-13, through this
+repo's own data clients. No task is shaped around Aegis internals;
+each one is scored only on whether the run's verdict matches what
+the sources support.
+
+**Finding honest decline tasks took real checking, and it taught me
+something about the sources.** My first assumption was that obscure
+genes would be easy to find. They are not, through these clients:
+ClinVar's gene search returns copy number records that span a locus,
+so nearly any symbol I probed came back with five ClinVar items and
+passed the gate on locus overlap alone. I probed roughly thirty
+candidate symbols live before choosing. The four decline tasks that
+survived the check are genuinely thin in the way the framework
+means: LINC03065, LINC02885, and LINC02648 have a handful of ClinVar
+copy number records over their loci and zero PubMed records, and
+MIR8071 has zero ClinVar records and three broad profiling papers
+that mention it in passing. One source at most, no literature or no
+classification record at all. A decline is the correct answer for
+each, and the ground truth notes say exactly that, with accessions.
+
+**The harness package.** `tasks.py` loads the set strictly: a task
+without ground truth notes, or with an expected outcome the harness
+cannot score, is rejected at load time. `configurations.py` defines
+the configuration interface COMPARISON.md promised (a name and a
+run_task callable) and registers the two LLM configurations with no
+runner and the reason attached. `scoring.py` computes the metrics
+that apply without a model, mechanically: task success as verdict
+against expected outcome, citation correctness as the checker's
+verified over total counts, decline correctness on the decline tasks
+with wrong declines on answerable tasks as their own line, and
+latency from the runner's clock. `runner.py` executes a task through
+the evidence core (dossier, citation check, gate), records live
+versus cache per task, and writes the results file. `__main__.py`
+is the command: `python -m aegis.comparison`.
+
+### Commands I used today
+
+- Task design probes: short Python scripts on the repo venv driving
+  `build_evidence_dossier`, `search_clinvar`, `search_pubmed`, and
+  `lookup_variant` live, per candidate gene and variant, against the
+  repo cache. Roughly thirty genes probed; thirteen tasks kept.
+- Tests as I built: `.venv/bin/python -m pytest
+  tests/test_comparison.py -q` (15 passed: verdict matching, scoring
+  and aggregate math, the stub builder path through the real checker
+  and gate, blocked configuration reporting, and the real task set
+  file loading under its own rules).
+- The run, twice, for reasons explained below:
+  `.venv/bin/python -m aegis.comparison` (cache warm), then
+  `.venv/bin/python -m aegis.comparison --cache-dir
+  /tmp/aegis-comparison-cache-20261113` (fresh cache, fully live).
+- Full suite at the end: `.venv/bin/python -m pytest -q`.
+
+### The partial run, and its real scores
+
+The saved results file is the second run, the fresh cache one,
+because a comparison number should come from live fetches, not from
+a cache my own ground truth probes had just warmed. The warm pass
+scored the same verdicts with 107 items; the live pass is the one
+on record:
+
+- Task success: 13 of 13 (100.0 percent). All nine answerable tasks
+  answered; all four decline tasks declined; zero wrong declines.
+- Citation correctness: 105 of 105 gathered items verified by the
+  citation checker (100.0 percent).
+- Decline correctness: 4 of 4 decline tasks correctly declined.
+- Approval gate violations: 0, by construction, and the results
+  file says why: this configuration runs the evidence pipeline and
+  has no irreversible tools in play, so there was no gated action
+  it could have executed. That zero is not a measurement and is
+  not presented as one.
+- Mean latency: 11.59 seconds per task, and that number needs its
+  context, which is the failure below. The eleven tasks that did
+  not touch gnomAD took between 1.4 and 3.4 seconds each.
+
+### What failed in the run, named plainly
+
+gnomAD did not answer on either variant task. Both lookups (CFTR
+7-117559590-ATCT-A and HBB 11-5227002-T-A) timed out at the
+client's 60 second budget during the live run, which is why the
+two variant tasks took 61.7 and 64.5 seconds and why the live run
+gathered 105 items instead of the warm pass's 107: the two gnomAD
+records are missing from it. The same lookups had answered during
+my ground truth checks earlier today (their frequencies are in the
+task set's notes, fetched live), so this is the gnomAD API's known
+latency variance, the same behaviour the Tranche 1 journal recorded,
+arriving in a scored run this time. The verdicts held because the
+gate needs two sources and ClinVar plus PubMed carried both tasks,
+and the dossier builder recorded the timeouts as source notes
+instead of hiding them, which the results file reproduces. But I
+am not going to soften what it means: on this run, Aegis could not
+have supported any claim about those two variants' population
+frequencies, because the frequency source never answered. A
+checked decline on the frequency question would have been the
+honest output for that sub question, and a future version of this
+harness should score variant tasks on their gnomAD item explicitly
+so a missing one costs a point somewhere visible.
+
+No decline mismatches and no task failures occurred: every verdict
+matched its ground truth expectation. The only failures in the run
+are the two gnomAD timeouts above.
+
+### What the LLM configurations need, and what happens then
+
+One thing: a live model API key, supplied by the user through the
+secure capture and read from the environment, never written into
+this repo. With it, I register a real run_task for each blocked
+configuration in configurations.py (the single plain call exactly
+as COMPARISON.md defines it, and the tools loop with recovery and
+gates off), and the same harness runs all three configurations over
+this same frozen task set with the same mechanical scoring:
+citation correctness checked against source records, decline
+correctness, recovery on the real failures the sources produce
+(after today, I expect gnomAD latency to be one of them), cost and
+latency per task. Only that run earns a comparison claim, whichever
+way it comes out.
+
+### The honest state after this tranche
+
+- **Now real:** the comparison harness, a real task set with source
+  record ground truth, and a partial run whose numbers are Aegis's
+  own on real tasks: 13 of 13 verdicts, 105 of 105 citations
+  verified, 4 of 4 declines, with two gnomAD timeouts recorded
+  against it in its own results file.
+- **Still blocked, by name:** configurations (i) and (ii), on a
+  live model API key. No comparison claim exists, and
+  COMPARISON.md's new status line points at the partial results
+  and says so.
+- **Tests:** 101 passing, up from 86, with the 15 new comparison
+  tests running entirely on fixtures and stubs.

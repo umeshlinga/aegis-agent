@@ -13,6 +13,16 @@ defined here has run and written its results file. The v1 numbers
 Aegis runtime against itself on local scripted tasks. They are not a
 market comparison and must never be quoted as one.
 
+**Status, 2026-11-13:** the harness defined here now exists
+(`src/aegis/comparison/`) and has run in part. The results file is
+`evals/results/results_comparison_aegis_only_2026-11-13.md`: the
+full Aegis configuration's own numbers on the real task set
+(`evals/comparison_tasks.json`, suite aegis-comparison-v1). The two
+LLM configurations are recorded in that file as blocked on a live
+model API key. No cross configuration claim exists yet, and none
+may be made from the partial run: it says what Aegis scored on real
+tasks, and nothing about how any other configuration scores.
+
 ## The three configurations
 
 Every task in the comparison suite runs under all three
