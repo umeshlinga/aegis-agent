@@ -1,0 +1,4 @@
+# One company website per line (home page URL). Pick 20 real B2B companies you would actually prospect.
+# Mix sizes and industries; include a few small companies with thin websites (that's where invented details show up most).
+# Example format:
+# https://www.example.com

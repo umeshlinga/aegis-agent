@@ -74,3 +74,24 @@ async def test_compare_offline(tmp_path):
     assert s["llm_only"]["citations_nonexistent"] > 0       # the problem being measured
     assert s["aegis"]["citation_failure_rate"] in (0.0, None)
     assert (tmp_path / "compare.html").exists()
+
+
+async def test_outreach_compare_offline(site, tmp_path, monkeypatch):
+    """Plain-LLM opener invents details; Aegis opener only keeps cited, verified sentences."""
+    from aegis.config import Settings
+    from aegis.evals.outreach_compare import run_outreach_compare
+
+    from .conftest import CHROME
+
+    if CHROME is None:
+        import pytest
+
+        pytest.skip("no Chrome")
+    s = Settings()
+    s.chrome_path = CHROME
+    summary = await run_outreach_compare([f"{site}/index.html"], s, "offline", str(tmp_path), concurrency=1)
+    assert summary["naive"]["unsupported_claims"] >= 1
+    assert summary["aegis"]["unsupported_claims"] == 0
+    row = json.loads((tmp_path / "rows.jsonl").read_text().splitlines()[0])
+    assert row["aegis_dropped"] >= 1  # the uncited "grown fast" sentence was removed by code
+    assert (tmp_path / "outreach_compare.html").exists()

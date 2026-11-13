@@ -17,12 +17,14 @@ from types import SimpleNamespace
 
 from .company import workload as company
 from .llm_only import workload as llm_only
+from .outreach_naive import workload as outreach_naive
 from .variant import workload as variant
 
 WORKLOADS = {
     "variant": SimpleNamespace(build=variant.build, register_tools=variant.register_tools),
     "company": SimpleNamespace(build=company.build, register_tools=company.register_tools),
     "llm_only": SimpleNamespace(build=llm_only.build, register_tools=llm_only.register_tools),
+    "outreach_naive": SimpleNamespace(build=outreach_naive.build, register_tools=outreach_naive.register_tools),
 }
 
 
@@ -203,7 +205,46 @@ def h_raw_llm(req):
                        "reasoning": "offline stand-in"})
 
 
+def h_naive_opener(req):
+    """Stand-in for 'homepage -> LLM': uses one real sentence, then embellishes
+    the way generation without verification tends to."""
+    d = json.loads(_content(req))
+    first = next((s for s in re.split(r"(?<=[.!?])\s+", d["company_homepage"]) if len(s.split()) > 5), "your platform")
+    return json.dumps({"subject": "Loved what you're building",
+                       "body": f"I noticed that {first[0].lower() + first[1:]} Congrats on your recent $40M Series B and "
+                               f"on growing the team past 500 people. Your work with Fortune 500 retailers stood out."})
+
+
+def h_grounded_opener(req):
+    d = json.loads(_content(req))
+    facts = d.get("verified_facts", [])
+    sents = [{"text": f"I saw that {f['value'].rstrip('.')}.", "fact_ids": [f["id"]]} for f in facts[:2]]
+    sents.append({"text": "Your team has clearly grown fast this year.", "fact_ids": []})  # uncited: code must drop it
+    sents.append({"text": "Would a short call next week be useful?", "fact_ids": []})
+    return json.dumps({"subject": "A question about your outbound research", "sentences": sents})
+
+
+def h_claim_extract(req):
+    c = _content(req)
+    parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", c) if p.strip()]
+    claims = [p for p in parts if not re.search(r"\?$|^(would|happy|best|hi|thanks)", p, re.I)]
+    return json.dumps({"claims": claims})
+
+
+def h_claim_judge(req):
+    c = _content(req)
+    claim = c.split("CLAIM:", 1)[1].split("EVIDENCE:", 1)[0]
+    ev = c.split("EVIDENCE:", 1)[1].lower()
+    toks = [t for t in re.findall(r"[a-z0-9$]+", claim.lower()) if len(t) > 3 and t not in
+            {"that", "your", "with", "noticed", "this", "have", "from", "congrats", "recent", "stood"}]
+    hit = sum(t in ev for t in toks) / max(len(toks), 1)
+    return json.dumps({"supported": hit >= 0.75, "reason": f"offline token overlap {hit:.0%}"})
+
+
 def register_offline_handlers(p) -> None:
+    for name, fn in {"naive_opener": h_naive_opener, "grounded_opener": h_grounded_opener,
+                     "claim_extract": h_claim_extract, "claim_judge": h_claim_judge}.items():
+        p.register(name, fn)
     p.register("raw_llm_classify", h_raw_llm)
     for name, fn in {
         "variant_plan": h_variant_plan, "lit_triage": h_lit_triage, "support_judge": h_support_judge,

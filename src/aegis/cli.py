@@ -213,6 +213,18 @@ async def cmd_compare(a):
     print(f"open {a.out}/compare.html")
 
 
+async def cmd_outreach_compare(a):
+    from .evals.outreach_compare import load_sites, run_outreach_compare
+
+    mode = a.mode or ("live" if Settings().has_llm() else "offline")
+    sites = (a.sites_list or load_sites(a.sites))[: a.n]
+    print(f"verified outreach vs plain LLM on {len(sites)} sites (mode={mode})")
+    s = await run_outreach_compare(sites, Settings(), mode, a.out, a.concurrency,
+                                   {"name": a.sender_name, "company": a.sender_company, "offer": a.offer})
+    print(json.dumps({k: s[k] for k in ("sites", "naive", "aegis", "paired_clean_email")}, indent=2, default=str))
+    print(f"open {a.out}/outreach_compare.html")
+
+
 def cmd_bench_build(a):
     from .evals.build_clinvar import build, download
 
@@ -346,6 +358,11 @@ def main(argv=None) -> None:
     sp.add_argument("--cases", default="evals/data/clinvar_benchmark.jsonl"); sp.add_argument("--n", type=int, default=30)
     sp.add_argument("--variants", nargs="*"); sp.add_argument("--truth", help="comma list of P/LP,B/LB,VUS for --variants")
     sp.add_argument("--out", default="evals/results/compare"); sp.add_argument("--concurrency", type=int, default=3)
+    sp = add("outreach-compare", cmd_outreach_compare, "verified outreach vs plain-LLM outreach on real company sites")
+    sp.add_argument("--sites", default="examples/sites.txt"); sp.add_argument("--sites-list", nargs="*")
+    sp.add_argument("--n", type=int, default=20); sp.add_argument("--out", default="evals/results/outreach")
+    sp.add_argument("--concurrency", type=int, default=2); sp.add_argument("--sender-name", default="Umesh")
+    sp.add_argument("--sender-company", default="Aegis"); sp.add_argument("--offer", default="verified, auditable outbound research")
     sp = add("bench-build", cmd_bench_build, "build the ClinVar temporal-split benchmark")
     sp.add_argument("--source"); sp.add_argument("--out", default="evals/data/clinvar_benchmark.jsonl")
     sp.add_argument("--cutoff", default="2024-06-30"); sp.add_argument("--n-per-class", type=int, default=40)

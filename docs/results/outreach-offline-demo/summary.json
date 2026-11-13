@@ -1,0 +1,40 @@
+{
+  "mode": "offline",
+  "sites": 1,
+  "naive": {
+    "emails": 1,
+    "claims": 3,
+    "unsupported_claims": 2,
+    "unsupported_claim_rate": 0.6666666666666666,
+    "emails_with_unsupported_claim": 1,
+    "email_failure_rate": 1.0,
+    "email_failure_ci": [
+      0.20654329147389294,
+      1.0
+    ],
+    "specific_claims_per_email": 3.0,
+    "mean_cost_usd": 0,
+    "median_secs": 1.8
+  },
+  "aegis": {
+    "emails": 1,
+    "claims": 2,
+    "unsupported_claims": 0,
+    "unsupported_claim_rate": 0.0,
+    "emails_with_unsupported_claim": 0,
+    "email_failure_rate": 0.0,
+    "email_failure_ci": [
+      0.0,
+      0.7934567085261071
+    ],
+    "specific_claims_per_email": 2.0,
+    "mean_cost_usd": 0,
+    "median_secs": 23.6
+  },
+  "paired_clean_email": {
+    "only_b_ok": 1,
+    "only_a_ok": 0,
+    "p_value": 1.0
+  },
+  "date": "2026-11-13"
+}

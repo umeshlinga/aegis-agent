@@ -102,6 +102,17 @@ aegis serve                                                 # product app on :80
 ```
 52 tests pass. Market research written up in `MARKET.md` (honest conclusion: grounded variant agents are an active field; Aegis's angle is measured reliability, reanalysis, and hard verification).
 
+## Phase 10b. Verified outreach comparison (for the AI-sales use case)
+
+**Why:** independent reviews of AI SDR tools keep naming the same failure: personalised emails that are bland or contain details the prospect's own site never said. The measurable version of that complaint is "unsupported claims per email".
+
+**Built:** an `opener` step in the company workload (every sentence that says something specific about the prospect must cite verified fact ids; code drops sentences that don't), `workloads/outreach_naive` (homepage → strong model → opener, i.e. common practice), and `evals/outreach_compare.py` (one independent checker for both arms: claim extraction, hybrid retrieval over everything captured from the site, strict judge from the judge_b tier; Wilson intervals; paired McNemar on clean emails).
+
+```bash
+aegis outreach-compare --sites examples/sites.txt --n 20     # live: 20 real company sites
+```
+Offline smoke on the flaky test site: plain LLM 2/3 claims unsupported ("$40M Series B", "500 people", "Fortune 500 retailers" are not on the site); Aegis 0/2, with one uncited sentence removed by code. Live numbers to come from real sites.
+
 ## Phase 11 (next, on my machine with keys)
 
 1. `aegis doctor` until every line is OK.

@@ -28,6 +28,7 @@ Details and sources: [`docs/MARKET.md`](docs/MARKET.md). (The field is active; A
 | Watch variants for reclassification | `aegis watch add <variant> --note "family 7"`; `aegis watch run` (schedule weekly) | **Watchlist** tab |
 | Compare against "just ask the LLM" | `aegis compare --cases evals/data/clinvar_benchmark.jsonl --n 30` | **LLM vs Aegis** tab |
 | Research a company site (browser agent, approval-gated outreach) | `aegis company https://acme.com --outreach` | `/explorer` |
+| Verified outreach vs plain-LLM outreach on real company sites | `aegis outreach-compare --sites examples/sites.txt --n 20` | report HTML |
 | Use from Claude Desktop | `aegis mcp` | |
 | Inspect any run: timeline, retries, failures | `aegis show <run_id>` | `/explorer` |
 
@@ -77,7 +78,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,rag,mcp]" && python -m playwright install chromium
 cp .env.example .env            # add ANTHROPIC_API_KEY; NCBI_EMAIL (+ NCBI_API_KEY) recommended
 aegis doctor                    # checks keys, browser, Ensembl/NCBI/gnomAD, and each model tier
-pytest -q                       # 52 tests, no keys needed, includes real-browser tests
+pytest -q                       # 53 tests, no keys needed, includes real-browser tests
 aegis serve                     # web app http://127.0.0.1:8080   ops explorer /explorer   metrics /metrics
 docker compose up --build       # + Jaeger traces :16686 + Prometheus :9090
 ```
@@ -100,7 +101,7 @@ src/aegis/
   tracing/     spans (+ OTLP), failure taxonomy, regression export
   api/         FastAPI: product app, explorer, REST, Prometheus
   mcp_server.py · cli.py
-tests/         52 tests incl. a deliberately flaky website driven by real Chrome
+tests/         53 tests incl. a deliberately flaky website driven by real Chrome
 docs/          MARKET, ARCHITECTURE, MODELS_AND_TOOLS, BUILD_LOG, DECISIONS, FAILURES, EVALS, LIMITATIONS, RUNBOOK
 ```
 

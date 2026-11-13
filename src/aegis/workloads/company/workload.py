@@ -63,6 +63,16 @@ class SupportVerdict(BaseModel):
     reason: str = ""
 
 
+class CitedSentence(BaseModel):
+    text: str
+    fact_ids: list[int] = Field(default_factory=list, description="ids of the verified facts this sentence relies on")
+
+
+class Opener(BaseModel):
+    subject: str
+    sentences: list[CitedSentence] = Field(default_factory=list, max_length=6)
+
+
 class SendEmailArg(BaseModel):
     to_domain: str
     subject: str
@@ -216,14 +226,44 @@ async def step_brief(ctx: StepContext) -> dict:
     return brief.model_dump()
 
 
+_SPECIFIC = re.compile(r"\d|\b(you|your|team|recently|launched|announced|customers|raised|hiring|based in|headquartered)\b", re.I)
+
+
+async def step_opener(ctx: StepContext) -> dict:
+    """Grounded opener: every sentence that says something specific about the
+    prospect must cite verified facts by id. Code removes sentences that make
+    specific claims without a citation, and citations to facts that don't exist.
+    This is the 'no claim without a source' rule, enforced outside the model."""
+    svc = ctx.services
+    facts = ctx.outputs["verify"]["facts"]
+    sender = ctx.run_input.get("sender") or {}
+    numbered = [{"id": i, "field": f["field"], "value": f["value"]} for i, f in enumerate(facts)]
+    req = LLMRequest(system=("Write a short, specific, honest first-touch sales email (3-5 sentences). Every sentence "
+                             "that states something about the prospect must cite the ids of the verified facts it "
+                             "uses. Do not state anything about the prospect that is not in a fact. No invented "
+                             "metrics, no fake familiarity."),
+                     messages=[{"role": "user", "content": json.dumps({"verified_facts": numbered, "sender": sender})}],
+                     tier="balanced", purpose="grounded_opener", max_tokens=600)
+    op, _ = await svc.router.structured(req, Opener)
+    kept, dropped = [], []
+    valid = set(range(len(facts)))
+    for snt in op.sentences:
+        ids = [i for i in snt.fact_ids if i in valid]
+        if _SPECIFIC.search(snt.text) and not ids:
+            dropped.append({"text": snt.text, "why": "specific claim without a verified fact"})
+            continue
+        kept.append({"text": snt.text, "facts": ids})
+    if dropped:
+        svc.store.add_event(ctx.run_id, "claim_rejected", {"why": "uncited sentence in opener", "n": len(dropped)})
+    body = " ".join(k["text"] for k in kept)
+    return {"subject": op.subject, "body": body, "sentences": kept, "dropped": dropped,
+            "sources": sorted({facts[i]["source_url"] for k in kept for i in k["facts"]})}
+
+
 async def step_outreach(ctx: StepContext) -> dict:
     svc = ctx.services
-    sender = ctx.run_input.get("sender") or {}
-    req = LLMRequest(system=("Draft a short, specific, honest first-touch email. Use only the brief. No invented "
-                             "metrics, no fake familiarity."),
-                     messages=[{"role": "user", "content": json.dumps({"brief": ctx.outputs["brief"], "sender": sender})}],
-                     tier="balanced", purpose="company_email", max_tokens=500)
-    email, _ = await svc.router.structured(req, Email)
+    op = ctx.outputs["opener"]
+    email = Email(subject=op["subject"], body=op["body"] or "(no verified facts to personalise with)")
     body, red = pii.redact(email.body)
     # HIGH risk: parks the run for a human unless approved.
     res = await svc.tools.call("outreach", "send_email",
@@ -237,7 +277,7 @@ async def step_final(ctx: StepContext) -> dict:
     return {"domain": _domain(ctx.run_input), "brief": o.get("brief"), "facts": o["verify"]["facts"],
             "rejected_facts": len(o["verify"]["rejected"]), "pages": [p["url"] for p in o["browse"]["pages"]],
             "browser": {k: o["browse"][k] for k in ("browser_stats", "recoveries", "injection_flags", "stop_reason")},
-            "outreach": o.get("outreach")}
+            "opener": o.get("opener"), "outreach": o.get("outreach")}
 
 
 def build(run_input: dict) -> Workflow:
@@ -248,8 +288,9 @@ def build(run_input: dict) -> Workflow:
         Step("extract", step_extract, ["browse"], retry=rp),
         Step("verify", step_verify, ["extract"], retry=rp),
         Step("brief", step_brief, ["verify"], retry=rp),
-        Step("outreach", step_outreach, ["brief"], retry=rp, optional=True,
-             condition=lambda out: bool(run_input.get("draft_outreach"))),
-        Step("final", step_final, ["brief", "outreach"], retry=rp),
+        Step("opener", step_opener, ["verify"], retry=rp, optional=True),
+        Step("outreach", step_outreach, ["brief", "opener"], retry=rp, optional=True,
+             condition=lambda out: bool(run_input.get("draft_outreach")) and bool(out.get("opener"))),
+        Step("final", step_final, ["brief", "opener", "outreach"], retry=rp),
     ]
     return Workflow("company", steps, result_step="final")
