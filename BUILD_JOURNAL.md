@@ -559,3 +559,161 @@ One query per source, through the built clients, small on purpose.
   and the product gets its first live model numbers. Phase 2 then
   wires today's data clients into the registry as read scope tools
   and builds the first real task set on live data.
+
+## V2 Day 2: the evidence core, dossiers, citation checking, and the decline gate
+
+### What I built today
+
+Tranche 2 is the piece that turns the Tranche 1 data clients into a
+product function: the evidence core in `src/aegis/evidence/` (813
+lines across six modules, plus 415 lines of tests in three new test
+files). It works on real data, end to end, and it involves no LLM at
+all. That was a deliberate sequencing decision, not an omission: the
+part of this product that must never depend on a model is the part
+that decides whether the evidence is real and whether it is enough,
+so I built that part as pure code over the live clients, and the
+model written summary, when a live key arrives, will sit on top of a
+dossier that has already passed it.
+
+**dossier.py.** `build_evidence_dossier(query)` takes a gene and an
+optional variant (an EvidenceQuery, or a string like "BRCA1" or
+"BRCA1 17-43044295-G-A" that parse_query reads strictly: anything
+beyond two words is rejected instead of guessed at). It asks ClinVar
+for classifications in the gene, PubMed for the literature, and
+gnomAD for population frequencies when a variant is named, and turns
+each returned record into one evidence item: source name, record id,
+title, a summary built from the record's own fields, the exact
+source URL, fetched_at, and from_cache. The dossier also counts
+items by source, and, the detail the whole tranche hangs on, it
+snapshots `returned_keys`, the (source, record id) pairs the clients
+actually returned in this run, recorded separately from the items.
+A source that fails is written into `source_errors` in plain words
+and the build continues with what the other sources returned. A
+partial dossier that says what is missing is useful. One that hides
+a failed source is not.
+
+**citations.py.** The citation checker, and the anti-hallucination
+gate this product is built around. Every item is checked three ways:
+the URL is well formed and sits on the host that source actually
+uses; the URL names the record the item claims (PMID in the PubMed
+URL path, variation id in the ClinVar URL path, variant id plus a
+named dataset in the gnomAD URL); and the item's key is in the
+dossier's returned snapshot, meaning a client really returned that
+record in this run. A failure removes the item and logs a
+CitationFailure with the reason in plain words. The checker never
+rewrites a URL or corrects an id into passing, because a checker
+that fixes citations would hide the failures it exists to catch.
+
+**gate.py.** The decline rule in code, as two named constants:
+MIN_ITEMS 3, MIN_SOURCES 2. The gate runs on the verified items
+only, never on the raw dossier, so an item the checker removed does
+not count toward the bar. Below either bar the verdict is a decline
+whose reason carries the actual numbers and names each missing piece
+("Missing: 1 more verified item and evidence from 1 more source").
+Nothing pads a thin dossier: the builder is not asked twice, items
+are not duplicated, and a decline is a complete result.
+
+**report.py and the command.** The report renderer produces the
+Markdown a user reads: the question, the verdict with its reason,
+the verified evidence grouped by source with each record's URL and
+provenance line, a section naming any citations the checker removed
+and why, a section for sources that did not answer, and a footer
+recording per source item counts, fetch times, and cache status.
+The command is `python -m aegis.evidence BRCA1` (with `--variant`,
+`--limit`, `--cache-dir`, and `--out` when needed). It runs the
+whole pipeline, writes the report, and prints where it went, the
+counts, and the verdict. It uses the data layer's DiskCache by
+default, so a repeat run is fast and the report says so.
+
+### Decisions I made today
+
+**The returned snapshot lives on the dossier, not in the checker.**
+The checker needs ground truth about what the clients returned, and
+that truth has to be recorded at build time, by the builder, before
+any later hand (mine, a person's, a model's) can touch the items.
+Keeping the snapshot as data on the dossier makes the fabrication
+test honest: a test adds a plausible item whose key is not in the
+snapshot, and the checker removes it for exactly the reason a real
+hallucinated citation would be removed.
+
+**Provenance is a snapshot, not a re-derivation.** I considered
+having the checker re-fetch each cited record from its source to
+prove it exists. Rejected for this tranche: it doubles network load,
+makes checking depend on the source being up twice, and answers a
+weaker question (the record exists somewhere) than the one that
+matters (this run actually retrieved it, and the answer is built
+from what this run retrieved). A live re-resolution check can join
+later as a second layer; the snapshot check is the gate.
+
+**The gate counts verified items, and its constants are named, not
+buried.** Three items from two sources is a judgement call, and a
+future reviewer should be able to find it, argue with it, and change
+it in one place. It is the same bar my evidence agent work used, and
+consistency across the two systems is worth more than a fresh guess.
+
+**Source failures are notes on the dossier, never exceptions out of
+the builder.** The CLI and the report both surface them. The one
+exception shape I kept: a gnomAD not_found for a variant the query
+named is recorded as a source note, never as a frequency of zero.
+That distinction was the Tranche 1 lesson and it holds here.
+
+### Commands I used today
+
+- Tests as I built, evidence files first: `.venv/bin/python -m
+  pytest tests/test_evidence_citations.py tests/test_evidence_gate.py
+  tests/test_evidence_report.py -q` (23 passed).
+- The live end to end run: `.venv/bin/python -m aegis.evidence BRCA1
+  --out examples/evidence/evidence_brca1_2026-11-13.md`, then a repeat
+  run of the same command to a scratch output to check the cache
+  path, then a fresh cache regeneration of the saved example after a
+  wording fix in the gate (below).
+- Full suite at the end: `.venv/bin/python -m pytest -q`.
+
+### The live BRCA1 run, and what came back
+
+The run gathered 10 evidence items, all from live fetch on the first
+run: 5 ClinVar records (four Pathogenic BRCA1 variants and one
+Likely benign, accessions VCV005042465.1 and its neighbours, all
+last evaluated in 2026) and 5 PubMed articles. gnomAD was not
+queried, because the query named no variant, and the report says the
+dossier rests on the two sources it used. The citation checker
+verified all 10 and removed 0. The gate passed: 10 verified items
+from 2 different sources, against a bar of 3 from 2. The report is
+saved at examples/evidence/evidence_brca1_2026-11-13.md, exactly as
+the command wrote it.
+
+The repeat run is the cache proof against live sources, not only
+against fixtures: the same command gathered the same 10 items, all
+10 from cache, in a fraction of a second, with the original live
+fetch timestamps preserved in the report footer.
+
+One failure I hit and fixed in the open: the first rendered report
+read "**Answerable.** Answerable: 10 verified items...", because the
+gate's reason string and the report's verdict line both carried the
+verdict word. I removed the prefix from the gate reasons (the
+verdict word belongs to the report), regenerated the saved example
+from a fresh cache so its fetch lines are an honest live run, and
+the fixture tests were updated by the same change passing unchanged,
+since they assert the numbers, not the prefix.
+
+What did not happen, honestly: no variant query was run live in this
+tranche, so the gnomAD path through the dossier builder is covered
+by the data layer's live smoke from Tranche 1 and by fixture shaped
+items in the checker tests, not by a live dossier run with a
+variant. That is a named gap, and the first live variant dossier is
+a small follow up, not a rewrite.
+
+### The honest state after this tranche
+
+- **Now real:** structured retrieval from three live sources into a
+  dossier, citation checking with a fabrication gate, the decline
+  rule in code, and a readable report, all runnable with no API key,
+  proven by 23 new tests (including the fabricated citation that
+  must be caught, and is) and one live BRCA1 run saved in the repo.
+- **Still pending the key:** the LLM summary layer that writes prose
+  on top of a verified, answerable dossier, the claim against record
+  content check that belongs with it, and Phase 1's live planner run.
+  PRODUCT_PLAN.md Phase 3 status now says exactly this split.
+- **Still pending wiring:** Phase 2, the data clients as registry
+  tools in the agent loop, with checker outcomes recorded in traces
+  and the Phase 3 acceptance run on that task set.

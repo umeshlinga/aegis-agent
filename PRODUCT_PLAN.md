@@ -69,20 +69,30 @@ recovery, router, tracing, eval harness, trace explorer, demo), real
 provider adapters for three model families, and, as of v2 Tranche 1,
 the first real-data layer: live clients for PubMed, ClinVar, and
 gnomAD in `src/aegis/data/`, each returning records with source URLs
-and fetch provenance. What does not exist yet is listed honestly in
-section (e), phase by phase.
+and fetch provenance. As of v2 Tranche 2, the evidence core on top of
+that layer is built and working on live data with no model involved:
+`src/aegis/evidence/` gathers a dossier for a gene or variant
+question from all three sources, checks every citation against the
+record it claims and against the set of records the clients actually
+returned, applies the decline gate (at least 3 verified items from at
+least 2 sources, or a stated decline), and renders the outcome as a
+Markdown report, runnable as `python -m aegis.evidence BRCA1`. What
+does not exist yet is listed honestly in section (e), phase by phase.
+The largest single gap: no live LLM has run in this product yet, so
+the model written summary layer is unbuilt, and the data clients are
+not yet wired into the agent loop as registry tools (Phase 2).
 
 ## (b) The real problems in current LLM and agent products, and the Aegis answer to each
 
 | Problem in current products | What it looks like in practice | The Aegis mechanism that answers it | State |
 | --- | --- | --- | --- |
-| Hallucinated citations | The model names papers, accessions, or database records that do not exist, or that do not say what the answer claims | Citations are never written from model memory. Tools return records with source URLs, the answer may only cite records a tool actually returned, and a verification step checks each citation against its source record before the answer is shown (RAG layer, section c) | Data layer built in Tranche 1; citation checker is a named v2 phase |
-| Unverified answers | A fluent answer is presented with no check between generation and the user | Verify after every step, at two levels: each tool step is verified programmatically before the run moves on, and the final answer passes an evidence check (every claim tied to a returned record) before release | Step verification built in v1; final answer check is a named v2 phase |
+| Hallucinated citations | The model names papers, accessions, or database records that do not exist, or that do not say what the answer claims | Citations are never written from model memory. Tools return records with source URLs, the answer may only cite records a tool actually returned, and a verification step checks each citation against its source record before the answer is shown (RAG layer, section c) | Data layer built in Tranche 1; citation checker built in Tranche 2 and fixture tested, including fabricated citations it must and does remove. The claim against record content check joins when the LLM summary layer lands |
+| Unverified answers | A fluent answer is presented with no check between generation and the user | Verify after every step, at two levels: each tool step is verified programmatically before the run moves on, and the final answer passes an evidence check (every claim tied to a returned record) before release | Step verification built in v1; the evidence side check (citation checker plus decline gate over a real dossier) built in Tranche 2. The check over model written claims is still pending the live LLM layer |
 | No recovery | The first failed tool call, changed page, or flaky API ends the run, or the agent retries the identical call until a budget dies | Classified failure taxonomy with strategy changing retries and rollback to the last verified checkpoint, measured with recovery on and off (v1: 30 of 30 tasks with recovery on, 17 of 30 with it off, on the local suite) | Built and measured in v1 on local tasks; the comparison harness re-measures it on real tasks |
 | No audit trail | After a run, nobody can say what the agent did, which model answered, or what anything cost | Append only JSONL traces of every state transition, model call (with tokens, latency, cost, and fallback events), tool call, verification, and recovery event; trace explorer renders any run as a timeline | Built in v1 |
 | Agents acting without approval | An agent sends, deletes, charges, or submits because a prompt told it to be helpful | Permission scopes on every tool (read, write, act, spend) with code level approval gates for irreversible actions. No approval path means blocked. A denial is final; recovery never retries around a gate | Built in v1; the web app adds the human approval surface |
 | Demos on fake data | The showcase runs on canned examples, so nothing about real world behaviour is learned | The product path runs on live public data only. The eval and comparison suites use real variants, genes, and questions with ground truth from source records (see COMPARISON.md) | Data layer built in Tranche 1; real task suite is a named v2 phase |
-| Confident answers on insufficient evidence | The model concludes anyway, because concluding is what it was asked to do | Decline as a first class outcome: below a stated evidence bar, the run ends in a decline with the missing evidence named, and decline correctness is a scored metric, not a hope | Rule designed in the builder's evidence work; scored in the comparison harness |
+| Confident answers on insufficient evidence | The model concludes anyway, because concluding is what it was asked to do | Decline as a first class outcome: below a stated evidence bar, the run ends in a decline with the missing evidence named, and decline correctness is a scored metric, not a hope | The gate itself built in Tranche 2 (at least 3 verified items from at least 2 sources, applied to verified items only) and boundary tested; decline correctness as a scored metric joins the comparison harness |
 | Cost and model opacity | The user cannot tell which model did the work or what a run cost | Per step model routing with fallback chains recorded in the trace, and per call cost and latency logged from the providers' own token counts | Built in v1; live provider verification is the first v2 phase |
 
 ## (c) Full architecture for v2
@@ -116,18 +126,22 @@ cost and latency in the trace. The v2 change is operational, not
 structural: real keys, a live planner run over the v1 suite, and the
 same run standing as the baseline the product is measured against.
 
-**RAG layer with verified citations (new).** Retrieval in this
-product is not a vector search over a scraped corpus. It is, first,
-structured retrieval: the agent's tools fetch records from named
-public sources, and those records are the retrieval set. A later phase
-may add vector retrieval over the fetched literature (the decision
-criteria are in TOOLS_AND_MODELS.md). The layer's defining piece is
-the citation checker: before an answer is released, every citation in
-it is resolved to the record it claims (by PMID, ClinVar accession,
-gnomAD variant id), and the claim next to the citation is checked
-against that record's actual fields. A citation that does not resolve,
-or a claim the record does not support, blocks the answer and is
-written to the trace.
+**RAG layer with verified citations (core built in Tranche 2).**
+Retrieval in this product is not a vector search over a scraped
+corpus. It is, first, structured retrieval: the tools fetch records
+from named public sources, and those records are the retrieval set.
+A later phase may add vector retrieval over the fetched literature
+(the decision criteria are in TOOLS_AND_MODELS.md). The layer's
+defining piece is the citation checker, built in `src/aegis/evidence/`:
+every citation is resolved to the record it claims (PMID in the
+PubMed URL, variation id in the ClinVar URL, variant id in the
+gnomAD URL), and the record must be one the client actually returned
+in that run, or the item is removed and the removal is logged in the
+report. The decline gate then decides, from the verified items only,
+whether an answer may be drawn at all. What is not built yet: the
+claim against record content check, which belongs to the LLM summary
+layer (a model writes claims; this layer today has no model in it),
+and that writing is gated on a live API key.
 
 **Real-data layer (Tranche 1, built).** `src/aegis/data/`: PubMed,
 ClinVar, and gnomAD clients, standard library only. Shared rules:
@@ -234,6 +248,20 @@ that does not exist) are caught by the checker and block the answer,
 recorded in the trace; uncorrupted answers pass with every citation
 resolving; the catch rate is reported from a harness run, not
 asserted.
+Status note (Tranche 2, 2026-11-13): the evidence core of this phase
+is built ahead of Phase 2 wiring, because it needs no LLM and no
+registry: structured retrieval into a dossier, the citation checker
+(URL shape, host, record id in URL, and the record actually returned
+in this run), the decline gate, and the Markdown report, with one
+live end to end example (BRCA1) saved under examples/evidence/.
+Fixture tests prove the checker removes a fabricated citation and
+that the gate declines below either bar. Still open for this phase:
+the acceptance run on the Phase 2 task set (that set does not exist
+until Phase 2 wires the clients into the agent loop), the catch rate
+from a harness run, trace recording of checker outcomes inside the
+agent loop, and the claim against record check plus the LLM summary
+layer on top of a verified dossier, which are the parts that need a
+live API key.
 
 **Phase 4: the web product app.**
 Scope: the minimal real product surface: question form, live run
