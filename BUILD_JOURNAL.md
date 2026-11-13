@@ -324,7 +324,7 @@ full results file.
 
 **Lineage, stated plainly.** The case study opens with a section I
 should have written on day one: where Aegis comes from. It grows
-directly out of the projects on the resume Jaspar Craft holds. The
+directly out of the projects on the resume Jaspar holds. The
 Agentic AI Framework for Genetic Evidence Discovery gave it the shape:
 multi-agent orchestration and retrieval, evaluation designed first, and
 an agent that declines what it cannot support with evidence. In Aegis
