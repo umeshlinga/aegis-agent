@@ -273,3 +273,93 @@ whether the system survives my own traps), and timings are one
 machine's. The adapters are unverified against live providers. The next
 honest step is Phase 3 work plus a run with a real model in the planner
 seat and tasks I did not design around the recovery taxonomy.
+
+
+## Day 3: the demo, the trace explorer, the case study, and publication
+
+### What I built today
+
+**The walkthrough demo.** `python -m aegis.demo` runs three beats
+against the local hostile test site, narrated live from the traces the
+runs themselves write. Beat 1 is the renamed button: the click fails as
+element_not_found, recovery diagnoses it, and the retry re-grounds and
+completes the task. Beat 2 is the transiently rejected form: the submit
+click fails verification, recovery classifies it, and the retry lands
+the submission, proven against the server's own records. Beat 3 is the
+permission gate, twice: a 25 dollar charge with no approval function
+configured is refused before the tool runs and the ledger stays empty,
+then the same charge with an approval function that grants it
+completes. One deliberate choice: the demo runs on the eval harness's
+own runner, so every beat is scored by the same mechanical scorers as
+the suite. A demo that grades itself with its own ruler is worth more
+than a scripted success. demo/WALKTHROUGH.md is the presenter script:
+what to run, what the audience sees at each beat, and the one-line
+explanation I would give out loud.
+
+**The trace explorer.** A read-only web UI over the JSONL trace store,
+standard library only, one embedded page, no build step
+(`python -m aegis.explorer`). It lists runs with task, mode, outcome,
+and duration, and opens each run as an ordered timeline: state
+transitions, model calls with tokens, latency, and cost, tool calls
+badged with their permission scope, verification results, and recovery
+events, with recovery highlighted in amber and permission-gate refusals
+in red. Two decisions worth recording. First, the explorer opens on a
+generated demo set: eight tasks from the suite (including a
+designed-failure browser task and the refused spend task) run in both
+modes through the real eval runner, so the timelines are real runs, not
+fixtures. Second, run modes live in a small manifest next to the trace
+file, written by the generator, because the runtime's trace format does
+not record which ablation mode produced a run; rather than guess from
+the events, the explorer reports "not recorded" for trace files that
+have no manifest. Permission scopes are looked up from the actual tool
+factories, so the badges cannot drift from the registry's declarations.
+The server refuses every non-GET method; it cannot mutate anything.
+
+**The case study.** The README now carries the case study end to end:
+the problem, the design, the eval method, the v2 results tables copied
+verbatim from the harness output file (I checked them byte for byte
+against the results file, programmatically), the honest limits, and
+links to the architecture doc, this journal, the walkthrough, and the
+full results file.
+
+**Lineage, stated plainly.** The case study opens with a section I
+should have written on day one: where Aegis comes from. It grows
+directly out of the projects on the resume Jaspar Craft holds. The
+Agentic AI Framework for Genetic Evidence Discovery gave it the shape:
+multi-agent orchestration and retrieval, evaluation designed first, and
+an agent that declines what it cannot support with evidence. In Aegis
+that rule becomes permission gates and honest aborts. The Reproducible
+NGS Pipeline Development work, and the production pipeline platform at
+Karyon Bio, gave it the discipline: QC and validation gates at every
+stage become verify-after-step; exact reproducibility becomes
+checkpoints and full traces; monitoring that catches failures before
+users do becomes the trace store and the explorer. The browser
+automation work, where grounding, verify-after-action, and failure
+recovery were the actual problems, became the browser arm and the
+recovery taxonomy. Same skills, same record, larger system. Nothing in
+Aegis claims a domain that is not already on that resume.
+
+### Publication
+
+Before pushing anywhere, I swept the tree: no secrets, no .env (only
+the placeholder .env.example), no personal data beyond my public name
+and GitHub username, and only fictional example.test addresses from the
+test fixtures. The repo is now public at
+https://github.com/umeshlinga/aegis-agent, pushed from this machine
+with the existing gh login. A stranger can clone it, run the demo, open
+the explorer, and check every number in the README against the results
+file. That was the point of keeping the traces-are-the-only-results
+rule from day one.
+
+### What remains before I show this to anyone
+
+One honest gap, unchanged since Day 2: the adapters have never run
+against a live provider, because there is no real API key in this
+environment. The next step is a live-model run: a real model in the
+planner seat over the same 30 tasks, scored the same way, with the
+scripted-planner numbers standing as the runtime baseline it has to be
+compared against. Until that run exists, every claim in the repo is
+careful to say the v2 numbers measure the runtime, not a model's
+planning. After it, the follow-on work is a larger suite with tasks I
+did not design around the recovery taxonomy, and only then is this the
+version I would put in front of a hiring team.
